@@ -183,7 +183,9 @@ c Compute power spectrum
 
       if(proc_id .eq. 0) then
          print *,'Power spectrum:'
-         print *,((k,E(k)),k=0,kmax)
+         do k=0,kmax
+             print *,k,E(k)
+         enddo
       endif
 
 c Free work space
