@@ -29,7 +29,7 @@ P3DFFT_LIB = libp3dfft.a
 
 # Be sure to set DFLAGS options in makeinc. The menu is as follows
 
-# -DDOUBLE_PREC : for double precision (default is single precision)
+# -DDOUBLE_PREC : for double precision (default is double precision)
 #
 # -DONED : for 1D decomposition (default is 2D but it can be made 1D through
 #    setting up grid 1 x n when running the code) 
