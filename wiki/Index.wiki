@@ -1,8 +1,9 @@
-#summary One-sentence summary of this page.
+#summary splash page for p3dfft
 
-= Introduction =
+<wiki:toc max_depth="1" />
 
-Add your content here.
+== To-do ==
+
 
 
 = Details =
