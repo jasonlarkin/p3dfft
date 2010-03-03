@@ -30,7 +30,7 @@ double static FORTNAME(t1),FORTNAME(t2),FORTNAME(t3),FORTNAME(t4);
 /* double t1,t2,t3,t4,tp1; */
 void compute_spectrum(float *B,int *st,int *sz,int *en,int *ng,float *E,int kmax,int root);
 
-main(int argc,char **argv)
+int main(int argc,char **argv)
 {
    float *A,*B, *E,*p1,*p;
    int i,j,k,x,y,z,nx,ny,nz,proc_id,nproc,dims[2],ndim,nu;

@@ -33,7 +33,7 @@
 double FORTNAME(t1),FORTNAME(t2),FORTNAME(t3),FORTNAME(t4),FORTNAME(tp1);
 /* double t1,t2,t3,t4,tp1; */
 
-main(int argc,char **argv)
+int main(int argc,char **argv)
 {
    float *A,*B,*p,*C;
    int i,j,k,x,y,z,nx,ny,nz,proc_id,nproc,dims[2],ndim,nu;
