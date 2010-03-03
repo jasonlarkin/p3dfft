@@ -1,1 +1,11 @@
 #summary How to install P3DFFT
+== Requirements == 
+P3DFFT requires:
+  * FFTW
+  * MPI
+
+== Downloading Directly == 
+You can get the latest release of P3DFFT from [http://p3dfft.googlecode.com/files/p3dfft.tar here].
+
+== Building P3DFFT == 
+Coming soon.
