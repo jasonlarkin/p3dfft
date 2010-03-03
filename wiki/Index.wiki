@@ -1,7 +1,7 @@
 #summary splash page for p3dfft
 
-<wiki:toc max_depth="1" />
+<wiki:toc max_depth="2" />
 
-= Documentation =
-= Papers and Presentations =
-= External Links =
+== Documentation ==
+== Papers and Presentations ==
+== External Links ==
