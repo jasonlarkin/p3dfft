@@ -1,5 +1,5 @@
   * Documentation
-    * [install Install P3DFFT] 
-    * [userguide User Guide]
-  * [pnpmaterials Papers and Presentations]
-  * [resources External Links]
+    * [Install Install P3DFFT] 
+    * [UserGuide User Guide]
+  * [Papers Papers and Presentations]
+  * [ExternalResources External Links]
