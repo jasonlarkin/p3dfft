@@ -36,7 +36,7 @@
 
 #elif defined GCC
 
-#define FORT_MOD_NAME(NAME) p3dfft__##NAME
+#define FORT_MOD_NAME(NAME) __p3dfft__##NAME
 #define FORTNAME(NAME) NAME##_
 
 #else
