@@ -1,4 +1,4 @@
 [install Install P3DFFT] 
-User Guide
-Papers and Presentations
-External Links
+[userguide User Guide]
+[pnpmaterials Papers and Presentations]
+[resources External Links]
