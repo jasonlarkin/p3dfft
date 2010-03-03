@@ -1,5 +1,6 @@
-#summary splash page for p3dfft
+#Welcome to the P3DFFT wiki!
 
+= Table of Contents =
 <wiki:toc max_depth="2" />
 
 == Documentation ==
