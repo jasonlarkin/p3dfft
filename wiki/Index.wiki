@@ -1,6 +1,4 @@
-#Welcome to the P3DFFT wiki!
-
-= Table of Contents =
+* Table of Contents *
 <wiki:toc max_depth="2" />
 
 == Documentation ==
