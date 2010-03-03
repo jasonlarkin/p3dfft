@@ -1,4 +1,7 @@
 #summary How to install P3DFFT
+== Introduction == 
+P3DFFT uses FFTW3 and MPI.
+
 == Requirements == 
 P3DFFT requires:
   * FFTW
