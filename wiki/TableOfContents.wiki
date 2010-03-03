@@ -1,10 +1,5 @@
-= Documentation =
-sample text
-== Install P3DFFT ==
-sample text
-== User Guide ==
-sample text
-= Papers and Presentations =
-sample text
-= External Links =
-sample text
+Documentation
+Install P3DFFT 
+User Guide
+Papers and Presentations
+External Links
