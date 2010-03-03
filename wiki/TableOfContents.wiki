@@ -1,5 +1,4 @@
-Documentation
-Install P3DFFT 
+[install Install P3DFFT] 
 User Guide
 Papers and Presentations
 External Links
