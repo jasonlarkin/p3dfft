@@ -131,7 +131,7 @@ int main(int argc,char **argv)
    for(z=0;z < isize[2];z++)
      for(y=0;y < isize[1];y++) 
        for(x=0;x < isize[0];x++) {
-          r = rand()/RAND_MAX;
+          r = 1.0*rand()/RAND_MAX;
 	  *p1++ = *p2++ = r;
        }
 
