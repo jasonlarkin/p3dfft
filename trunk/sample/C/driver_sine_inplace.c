@@ -58,10 +58,13 @@ int main(int argc,char **argv)
 
  
    if(proc_id == 0) {
-     fp = fopen("stdin","r");
-     ndim = 2;
-     fscanf(fp,"%d,%d,%d,%d,%d\n",&nx,&ny,&nz,&ndim,&n);
-     fclose(fp);
+     if((fp=fopen("stdin", "r"))==NULL){
+        printf("Cannot open file. Setting to default nx=ny=nz=128, ndim=2, n=1.\n");
+        nx=ny=nz=128; n=1;
+     } else {
+        fscanf(fp,"%d,%d,%d,%d,%d\n",&nx,&ny,&nz,&ndim,&n);
+        fclose(fp);
+     }
      printf("Single precision\n (%d %d %d) grid\n %d proc. dimensions\n%d repetitions\n",nx,ny,nz,ndim,n);
    }
    MPI_Bcast(&nx,1,MPI_INT,0,MPI_COMM_WORLD);
