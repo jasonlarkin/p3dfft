@@ -1,1 +1,4 @@
 #summary External Resources
+  * [http://www-03.ibm.com/systems/software/essl/index.html ESSL]
+  * [http://fftw.org/ FFTW]
+  * http://www.sdsc.edu/us/newsletter/common/newsletter.php?issue=2006-09&corner=fstory SDSC Article on FFT]
