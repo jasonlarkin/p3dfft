@@ -1,4 +1,6 @@
+* Documentation *
   * [Install Install P3DFFT] 
   * [UserGuide User Guide]
+* Resources *
   * [Papers Papers and Presentations]
   * [ExternalResources External Links]
