@@ -1,4 +1,4 @@
-#Version 2.3
+#summary Version 2.3
 
 Copyright (C) 2006-2008 Dmitry Pekurovsky
 San Diego Supercomputer Center/UC SanDiego
