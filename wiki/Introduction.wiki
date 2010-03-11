@@ -1,4 +1,3 @@
 #summary Introduction to P3DFFT
 
-= Introduction =
 Welcome to the Google Code page of P3DFFT!
