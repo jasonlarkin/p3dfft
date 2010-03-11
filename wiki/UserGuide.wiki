@@ -6,7 +6,7 @@ San Diego Supercomputer Center/UC SanDiego
 Copyright (C) 2008 Jens Henrik Goebbert (ghost cell support)
 RWTH-Aachen, Germany
 
-<table border="1" cellpadding="20"><tr><td>
+<table border="1" cellpadding="20" bgcolor="#FFFFC6"><tr><td>
 P3DFFT is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
