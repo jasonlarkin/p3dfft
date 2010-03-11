@@ -48,15 +48,29 @@
 
 extern void FORT_MOD_NAME(p3dfft_setup)(int *dims,int *nx,int *ny,int *nz, int *ow);
 extern void FORT_MOD_NAME(get_dims)(int *,int *,int *,int *);
+
+#ifdef DOUBLEPRECISION
+extern void FORT_MOD_NAME(p3dfft_ftran_r2c)(double *A,double *B);
+extern void FORT_MOD_NAME(p3dfft_btran_c2r)(double *A,double *B);
+#else
 extern void FORT_MOD_NAME(p3dfft_ftran_r2c)(float *A,float *B);
 extern void FORT_MOD_NAME(p3dfft_btran_c2r)(float *A,float *B);
+#endif
+
 extern void FORT_MOD_NAME(p3dfft_clean)();
 extern void FORTNAME(abort)();
 
 extern void p3dfft_setup(int *dims,int nx,int ny,int nz,int ovewrite);
 extern void get_dims(int *,int *,int *,int );
+
+#ifdef DOUBLEPRECISION
+extern void p3dfft_ftran_r2c(double *A,double *B);
+extern void p3dfft_btran_c2r(double *A,double *B);
+#else
 extern void p3dfft_ftran_r2c(float *A,float *B);
 extern void p3dfft_btran_c2r(float *A,float *B);
+#endif
+
 extern void p3dfft_clean();
 
 void p3dfft_setup(int *dims,int nx,int ny,int nz, int overwrite)
@@ -69,15 +83,30 @@ void get_dims(int *start,int *end,int *size,int conf)
   FORT_MOD_NAME(get_dims)(start,end,size,&conf);
 }
 
+#ifdef DOUBLEPRECISION
+void p3dfft_ftran_r2c(double *A,double *B)
+{
+  FORT_MOD_NAME(p3dfft_ftran_r2c)(A,B);
+}
+#else
 void p3dfft_ftran_r2c(float *A,float *B)
 {
   FORT_MOD_NAME(p3dfft_ftran_r2c)(A,B);
 }
 
+#endif
+
+#ifdef DOUBLEPRECISION
+void p3dfft_btran_c2r(double *A,double *B)
+{
+  FORT_MOD_NAME(p3dfft_btran_c2r)(A,B);
+}
+#else
 void p3dfft_btran_c2r(float *A,float *B)
 {
   FORT_MOD_NAME(p3dfft_btran_c2r)(A,B);
 }
+#endif
 
 void p3dfft_clean()
 {
