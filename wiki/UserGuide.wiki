@@ -116,19 +116,22 @@ How to use ghost cell support:
   # Init ghost-support:
     <table>
     <tr><td>call p3dfft_init_ghosts(goverlap)</td></tr>
-    <tr><td>goverlap = overlap of ghost-cell-slab
-    (limitations: only one goverlap supported)
-    (of course we are still assuming periodic boundary conditions)
-    </td></tr></table>
+    <tr><td>goverlap = overlap of ghost-cell-slab</td></tr>
+    <tr><td>(limitations: only one goverlap supported)</td></tr>
+    <tr><td>(of course we are still assuming periodic boundary conditions)</td></tr>
+    </table>
   # Allocation of memory:
-    each array which needs ghost-cell-support has to have the min. size:
-
-    fsize(1)+2*goverlap *
-    fsize(2)+2*goverlap *
-    fsize(3)+2*goverlap
+    <table>
+    <tr><td>each array which needs ghost-cell-support has to have the min. size:</td></tr>
+    <tr><td>&nbsp;</td></tr>
+    <tr><td>fsize(1)+2*goverlap *</td></tr>
+    <tr><td>fsize(2)+2*goverlap *</td></tr>
+    <tr><td>fsize(3)+2*goverlap</td></tr>
+    </table>
   # Exchange ghost-cells among processors to update the ghost-cells among the proceesors
-    ==>> call update_rghosts(array).
-    This will assume data represents physical space!
+    <table>
+    <tr><td>==>> call update_rghosts(array).</td></tr>
+    <tr><td>This will assume data represents physical space!</td></tr>
   # use/read ghost-cells if you want to access/read ghost-cells
     ==>> call ijk2i(i,j,k)
     which returns the position in a 1D-array as an integer*8
