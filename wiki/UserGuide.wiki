@@ -14,15 +14,15 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 </td></tr></table>
 
-*Click here to download the PDF version of the User Guide*
-Acknowledgements
+*Click [http://www.sdsc.edu/us/resources/p3dfft/docs/P3DFFT_USER_GUIDE_2.3.pdf here] to download the PDF version of the User Guide*</br>
+*Acknowledgements*
 
-    * Prof. P.K.Yeung
-    * Dr. Diego Donzis
-    * Dr. Giri Chukkapalli
-    * Dr. Geert Brethouwer
+  * Prof. P.K.Yeung
+  * Dr. Diego Donzis
+  * Dr. Giri Chukkapalli
+  * Dr. Geert Brethouwer
 
-Using the P3DFFT Library
+*Using the P3DFFT Library*
 1. p3dfft module
 
 The p3dfft module declares important variables. It should be included in any code that calls P3DFFT routines (via use p3dfft statement in Fortran).
