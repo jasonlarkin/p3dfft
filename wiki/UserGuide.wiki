@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License along with thi
 </td></tr></table>
 
 *Click [http://www.sdsc.edu/us/resources/p3dfft/docs/P3DFFT_USER_GUIDE_2.3.pdf here] to download the PDF version of the User Guide*
-*Acknowledgements*
+<p>*Acknowledgements*
 
   * Prof. P.K.Yeung
   * Dr. Diego Donzis
