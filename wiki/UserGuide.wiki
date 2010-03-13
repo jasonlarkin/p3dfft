@@ -114,12 +114,12 @@ Elementary ghost cell operations (nearest-neighbor/halo send-receive) are enable
 How to use ghost cell support:
 
   # Init ghost-support:
-    <table><tr><td>
-    call p3dfft_init_ghosts(goverlap)
-    goverlap = overlap of ghost-cell-slab
+    <table>
+    <tr>call p3dfft_init_ghosts(goverlap)</tr>
+    <tr>goverlap = overlap of ghost-cell-slab
     (limitations: only one goverlap supported)
     (of course we are still assuming periodic boundary conditions)
-    </td></tr></table>
+    </tr></table>
   # Allocation of memory:
     each array which needs ghost-cell-support has to have the min. size:
 
