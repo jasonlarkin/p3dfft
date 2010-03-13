@@ -35,14 +35,14 @@ Before using the library it is necessary to call an initialization routine 'p3df
 *Usage:* p3dfft_setup(proc_dims,nx,ny,nz,overwrite)
 
 *Table 1:* Arguments of p3dfft_setup
-<p>
+
 || *Argument* || *Intent* || *Description* || 
 || _proc_dims_ || _Input_ || An array of two integers, specifying how the processor grid should be decomposed. Either 1D or 2D decomposition can be specified. For example, when running on 12 processors, (4,3) or (2,6) can be specified as proc_dims to indicate a 2D decomposition, or (1,12) can be specified for 1D decomposition. proc_dims values are used to initialize P1 and P2. ||
 || _nx, ny, nz_ || _Input_ || (Integer) Dimensions of the 3D transform (also the global grid dimensions) || 
 || overwrite || Input || (Logical) When set to .true. (or 1 in C) this argument indicates that it is safe to overwrite the input of the btran (backward transform) routine. This may speed up performance of FFTW routines in some cases when non-stride-1 transforms are made. || 
-<p>
+
 To initialize ghost cells operations, a call to p3dfft_init_ghosts should be made. See example driver_ghost.f in sample/FORTRAN.
-3. Array Decomposition
+====3. Array Decomposition====
 
 The p3dfft_setup routine sets up the two-dimensional (2D) array decomposition. P3DFFT employs 2D block decomposition whereby processors are arranged into a 2D grid P1 x P2, based on their MPI rank. Two of the dimensions of the 3D grid are block-distributed across the processor grid, by assigning the blocks to tasks in the rank order. The third dimension of the grid remains undivided, i.e. contained entirely within local memory (see Fig. 1). This scheme is sometimes called pencils decomposition.
 
