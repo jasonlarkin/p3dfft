@@ -48,7 +48,8 @@ The p3dfft_setup routine sets up the two-dimensional (2D) array decomposition. P
 
 A block decomposition is defined by dimensions of the local portion of the array contained within each task, as well as the beginning and ending indices for each dimension defining the array’s location within the global array. This information is returned by get_dims routine which should be called before setting up the data structures of your program (see sample/ subdirectory for example programs).
 
-Figure 1: An example of 2D block( a.k.a. pencils) decomposition of a 3D grid.
+*Figure 1:* An example of 2D block( a.k.a. pencils) decomposition of a 3D grid.
+http://www.sdsc.edu/us/resources/p3dfft/blocks.jpg
 
 In P3DFFT, the decompositions of the output and input arrays, while both being two-dimensional, differ from each other. The reason for this is as follows. In 3D Fourier Transform it is necessary to transpose the data a few times (two times for two-dimensional decomposition) in order to rearrange the data so as to always perform one-dimensional FFT on data local in memory of each processing element. It would be possible to transpose the data back to the original form after the 3D transform is done, however it often makes sense to save significant time by forgoing this final transpose. All the user has to do is to operate on the output array while keeping in mind that the data are in a transposed form. The backward (complex-to-real) transform takes the array in a transposed form and produces a real array in the original form. The rest of this section clarifies exactly the original and transposed form of the arrays.
 
@@ -73,7 +74,7 @@ P3DFFT uses 2D block decomposition to assign local arrays for each task. In many
 It should be clear that the user’s choice of P1 and P2 can make a difference on how balanced is the decomposition. Obviously the greater load imbalance, the less performance can be expected.
 
 Note: the two array types are distributed among processors in a different way from each other, but this does not automatically imply anything about the ordering of the elements in memory. Memory layout of the original (ip=1) array uses the “Fortran” ordering. For example, for an array A(lx,ly,lz) the index corresponding to lx runs fastest. Memory layout for the transposed (ip=2) array type depends on how the P3DFFT library was built. By default, it preserves the ordering of the real array, i.e. (X,Y,Z). However, in many cases it is advisable to have Z dimension contiguous, i.e. a memory layout (Z,X,Y). This can speed up some computations in the wavenumber space by improving cache utilization through spatial locality in Z, and also often results in better performance of P3DFFT transforms themselves. The (Z,X,Y) layout can be triggered by building the library with –DSTRIDE1 preprocessor flag in the makefile. For more information, see performance section below.
-4. Forward (real-to-complex) and backward (complex-to-real) 3D Fourier transforms
+====4. Forward (real-to-complex) and backward (complex-to-real) 3D Fourier transforms====
 
 Forward transform is implemented by the p3dfft_ftran_r2c subroutine using the following format:
 
