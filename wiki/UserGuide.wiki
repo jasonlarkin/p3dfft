@@ -115,11 +115,11 @@ How to use ghost cell support:
 
   # Init ghost-support:
     <table>
-    <tr>call p3dfft_init_ghosts(goverlap)</tr>
-    <tr>goverlap = overlap of ghost-cell-slab
+    <tr><td>call p3dfft_init_ghosts(goverlap)</td></tr>
+    <tr><td>goverlap = overlap of ghost-cell-slab
     (limitations: only one goverlap supported)
     (of course we are still assuming periodic boundary conditions)
-    </tr></table>
+    </td></tr></table>
   # Allocation of memory:
     each array which needs ghost-cell-support has to have the min. size:
 
