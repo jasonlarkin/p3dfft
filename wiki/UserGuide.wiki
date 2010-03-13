@@ -49,7 +49,7 @@ The p3dfft_setup routine sets up the two-dimensional (2D) array decomposition. P
 A block decomposition is defined by dimensions of the local portion of the array contained within each task, as well as the beginning and ending indices for each dimension defining the array’s location within the global array. This information is returned by get_dims routine which should be called before setting up the data structures of your program (see sample/ subdirectory for example programs).
 
 *Figure 1:* An example of 2D block( a.k.a. pencils) decomposition of a 3D grid.
-<br />http://www.sdsc.edu/us/resources/p3dfft/blocks.jpg
+<p />http://www.sdsc.edu/us/resources/p3dfft/blocks.jpg
 
 In P3DFFT, the decompositions of the output and input arrays, while both being two-dimensional, differ from each other. The reason for this is as follows. In 3D Fourier Transform it is necessary to transpose the data a few times (two times for two-dimensional decomposition) in order to rearrange the data so as to always perform one-dimensional FFT on data local in memory of each processing element. It would be possible to transpose the data back to the original form after the 3D transform is done, however it often makes sense to save significant time by forgoing this final transpose. All the user has to do is to operate on the output array while keeping in mind that the data are in a transposed form. The backward (complex-to-real) transform takes the array in a transposed form and produces a real array in the original form. The rest of this section clarifies exactly the original and transposed form of the arrays.
 
