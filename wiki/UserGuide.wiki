@@ -63,10 +63,7 @@ In P3DFFT, the decompositions of the output and input arrays, while both being t
 || _end_ || Output || An array containing 3 integers, defining the ending indices of the local array within the global grid (these can be computed from start and size but are provided for convenience). ||
 || _size_ || Output || An array containing 3 integers, defining the local array’s dimensions. || 
 || _ip_ || Input || An integer argument specifying one of the two choices for array types:
-ip=1: "Original": a "physical space" array of real numbers, local in X, distributed among P1 tasks in Y dimension and P2 tasks in Z dimension, where P1 and P2 are processor grid dimensions defined in the call to p3dfft_setup. Usually this type of array is an input to real-to-complex (forward) transform and an output of complex-to-real (backward) transform. ||
-
-ip=2: "Transposed": a "wavenumber space" array of
-complex numbers, local in Z, distributed among P1 tasks in X dimension, P2 tasks in Y dimension. Usually this type of array is an output of real-to-complex (forward) transform and an input to complex-to-real, backward transform.
+ip=1: "Original": a "physical space" array of real numbers, local in X, distributed among P1 tasks in Y dimension and P2 tasks in Z dimension, where P1 and P2 are processor grid dimensions defined in the call to p3dfft_setup. Usually this type of array is an input to real-to-complex (forward) transform and an output of complex-to-real (backward) transform. ip=2: "Transposed": a "wavenumber space" array of complex numbers, local in Z, distributed among P1 tasks in X dimension, P2 tasks in Y dimension. Usually this type of array is an output of real-to-complex (forward) transform and an input to complex-to-real, backward transform. ||
 
 Note: the layout of the 2D processor grid on the physical network is dependent on the architecture and software of the particular system, and can have some impact on efficiency of communication. By default, rows have processors with adjacent task IDs (this corresponds to "FORTRAN" type ordering). This can be changed to "C" ordering (columns have adjacent task IDs) by building the library with -DDIMS_C preprocessor flag. The former way is recommended on most systems.
 
