@@ -113,11 +113,11 @@ Finally, performance will be better if overwrite parameter is set to .true. (or 
 Elementary ghost cell operations (nearest-neighbor/halo send-receive) are enabled in this version. See _driver_ghost.f_ in _sample/FORTRAN/_ for an example of the use.
 How to use ghost cell support:
 
-  # Init ghost-support:
+  # <table><tr><td>Init ghost-support:
     call p3dfft_init_ghosts(goverlap)
     goverlap = overlap of ghost-cell-slab
     (limitations: only one goverlap supported)
-    (of course we are still assuming periodic boundary conditions)
+    (of course we are still assuming periodic boundary conditions)</td></tr></table>
   # Allocation of memory:
     each array which needs ghost-cell-support has to have the min. size:
 
