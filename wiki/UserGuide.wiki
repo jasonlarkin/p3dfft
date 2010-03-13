@@ -28,15 +28,16 @@ You should have received a copy of the GNU General Public License along with thi
 The p3dfft module declares important variables. It should be included in any code that calls P3DFFT routines (via use p3dfft statement in Fortran).
 
 The p3dfft module also specifies mytype, which is the type of real and complex numbers. Its value of 4 corresponds to single precision and 8 for double precision. You can choose precision at compile time through a preprocessor flag (see Installation Guide).
-2. Initialization
 
+====2. Initialization====
 Before using the library it is necessary to call an initialization routine 'p3dfft_setup'.
 
-Usage: p3dfft_setup(proc_dims,nx,ny,nz,overwrite)
+*Usage:* p3dfft_setup(proc_dims,nx,ny,nz,overwrite)
 
-Table 1: Arguments of p3dfft_setup
-Argument 	Intent 	Description
-proc_dims 	Input 	An array of two integers, specifying how the processor grid should be decomposed. Either 1D or 2D decomposition can be specified. For example, when running on 12 processors, (4,3) or (2,6) can be specified as proc_dims to indicate a 2D decomposition, or (1,12) can be specified for 1D decomposition. proc_dims values are used to initialize P1 and P2.
+*Table 1:* Arguments of p3dfft_setup
+
+|| *Argument* || *Intent* || *Description* || 
+|| _proc_dims_ || _Input_ || An array of two integers, specifying how the processor grid should be decomposed. Either 1D or 2D decomposition can be specified. For example, when running on 12 processors, (4,3) or (2,6) can be specified as proc_dims to indicate a 2D decomposition, or (1,12) can be specified for 1D decomposition. proc_dims values are used to initialize P1 and P2. ||
 nx, ny, nz 	Input 	(Integer) Dimensions of the 3D transform (also the global grid dimensions)
 overwrite 	Input 	(Logical) When set to .true. (or 1 in C) this argument indicates that it is safe to overwrite the input of the btran (backward transform) routine. This may speed up performance of FFTW routines in some cases when non-stride-1 transforms are made.
 
