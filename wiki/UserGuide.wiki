@@ -22,9 +22,9 @@ You should have received a copy of the GNU General Public License along with thi
   * Dr. Giri Chukkapalli
   * Dr. Geert Brethouwer
 
-*Using the P3DFFT Library*
-1. p3dfft module
+===Using the P3DFFT Library===
 
+====1. p3dfft module====
 The p3dfft module declares important variables. It should be included in any code that calls P3DFFT routines (via use p3dfft statement in Fortran).
 
 The p3dfft module also specifies mytype, which is the type of real and complex numbers. Its value of 4 corresponds to single precision and 8 for double precision. You can choose precision at compile time through a preprocessor flag (see Installation Guide).
