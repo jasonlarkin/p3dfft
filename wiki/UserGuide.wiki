@@ -123,7 +123,7 @@ How to use ghost cell support:
   # Allocation of memory:
     <table>
     <tr><td>each array which needs ghost-cell-support has to have the min. size:</td></tr>
-    <tr><td>&nbsp;</td></tr>
+    <tr><td> </td></tr>
     <tr><td>fsize(1)+2*goverlap *</td></tr>
     <tr><td>fsize(2)+2*goverlap *</td></tr>
     <tr><td>fsize(3)+2*goverlap</td></tr>
@@ -149,7 +149,6 @@ How to use ghost cell support:
     </table>
   # structure in memory:
     <table><tr><td>http://i44.tinypic.com/wtbp55.gif</td></tr></table>
-
   # A more closer look at "A":
     <table><tr><td>http://i41.tinypic.com/2ch11rk.gif</td></tr></table>
 
