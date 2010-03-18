@@ -132,6 +132,7 @@ How to use ghost cell support:
     <table>
     <tr><td>==>> call update_rghosts(array).</td></tr>
     <tr><td>This will assume data represents physical space!</td></tr>
+    </table>
   # use/read ghost-cells if you want to access/read ghost-cells
     <table>
     <tr><td>==>> call ijk2i(i,j,k)</td></tr>
