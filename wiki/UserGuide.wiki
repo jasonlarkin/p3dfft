@@ -159,12 +159,14 @@ How to use ghost cell support:
     <table>
     <tr><td>The data overlap between two processors - equal to the thickness of a ghost-slab. This version supports only one fixed overlap value, because it simplifies the coding. If different overlaps for different arrays are needed the, following varables must be dependent on the overlap-value and therefore should have one additional dimension. A good idea would be to make p3dfft_init_ghosts(..) return an id,which has to get set when calling update_ghosts(data,id).</td></tr>
     </table>
-   2. gmem_start(1..6) (-X,-Y,-Z,+X,+Y,+Z)
-      Start of data in memory for ghost-cells of certain side.
-   3. gmess_size(1..3) (X,Y,Z)
-      Size of mpi message needed to send/recieve ghost-slab each dimension(1..3)
-   4. gslab_start(1..3, 1..6)
-      Relative start coord. of ghost-slab in pencil ijk(1..3), [neg./pos side(1..2) for each dimension(1..3)](1..6)
+  # *gmem_start(1..6) (-X,-Y,-Z,+X,+Y,+Z)*
+     <table><tr><td>Start of data in memory for ghost-cells of certain side.</td></tr><table>
+  # *gmess_size(1..3) (X,Y,Z)*
+     <table>
+     <tr><td>Size of mpi message needed to send/recieve ghost-slab each dimension(1..3)</td></tr>
+  # gslab_start(1..3, 1..6)*
+     <table>
+     <tr><td>Relative start coord. of ghost-slab in pencil ijk(1..3), [neg./pos side(1..2) for each dimension(1..3)](1..6)</tr></td></table>
 
         -X   -Y   -Z   +X   +Y   +Z
       i
