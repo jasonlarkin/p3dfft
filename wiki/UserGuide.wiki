@@ -138,14 +138,13 @@ How to use ghost cell support:
 
 *array-memory:*
 
-   1.
-
-      size if complex-type:
-
-      fsize(1)+2*goverlap *
-      fsize(2)+2*goverlap *
-      fsize(3)+2*goverlap
-   2.
+  # size if complex-type:
+    <table>
+    <tr><td>fsize(1)+2*goverlap *</td></tr>
+    <tr><td>fsize(2)+2*goverlap *</td></tr>
+    <tr><td>fsize(3)+2*goverlap</td></tr>
+    </table>
+  #
 
       structure in memory:
 
