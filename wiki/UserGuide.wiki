@@ -147,23 +147,8 @@ How to use ghost cell support:
     <tr><td>fsize(2)+2*goverlap *</td></tr>
     <tr><td>fsize(3)+2*goverlap</td></tr>
     </table>
-  #
-
-      structure in memory:
-
-      |000000000000000000000000000|11111|22222|33333|44444|55555|66666|
-                 ^^^^              ^     ^     ^     ^     ^     ^
-          input/output of FFT      A     B     C     D     E     F
-      		
-
-      ghost-cell-slab at each pencil-side:
-
-      A:  -X,Y*Z	A(istart(1)-i, j,k)		=> gmem_start(1)
-           B:  +X,Y*Z	B(i,j,k)				=> gmem_start(2)
-           C:  -Y,X*Z	C(i,j,k)				=> gmem_start(3)
-           D:  +Y,X*Z	D(i,j,k)				=> gmem_start(4)
-           E:  -Z,X*Y	E(i,j,k)				=> gmem_start(5)
-           F:  +Z,X*Y	F(i,j,k)				=> gmem_start(6)
+  # structure in memory:
+    <table><tr><td>http://i44.tinypic.com/wtbp55.gif</td></tr></table>
 
    3.
 
