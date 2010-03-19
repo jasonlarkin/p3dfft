@@ -184,7 +184,7 @@ How to use ghost cell support:
      <tr><td>k</td></tr>
      </table>
   # *gslab_size(1..3, 1..3)* Size of ghost-slab for each dimension(1..3), ijk(1..3)
-  # *gneighb_(numtasks x(3 x 2))* Extended processor grid with all processor neighbours in -/+XYZ(1..6) including periodic boundary neighbours.
+  # *gneighb(numtasks x(3 x 2))* Extended processor grid with all processor neighbours in -/+XYZ(1..6) including periodic boundary neighbours.
       <table>
       <tr><td>Example for 2 processors with gneighb_r(:) = 0,0,0,0,1,1,1,1,1,1,0,0</td></tr>
       <tr><td>pencil-side: -X  +X  -Y  +Y  -Z  +Z</td></tr>
@@ -193,7 +193,6 @@ How to use ghost cell support:
       </table>
 
 ==References==
-
   # ESSL library, IBM, http://publib.boulder.ibm.com/infocenter/clresctr/vxrx/index.jsp?topic=/com.ibm.cluster.essl.doc/esslbooks.html
   # Matteo Frigo and Steven G. Johnson, "The Design and Implementation of FFTW3", Proceedings of the IEEE 93 (2), 216–231 (2005). Invited paper, Special Issue on Program Generation, Optimization, and Platform Adaptation.
 
