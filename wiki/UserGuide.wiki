@@ -170,11 +170,12 @@ How to use ghost cell support:
      <table>
      <tr><td>Relative start coord. of ghost-slab in pencil ijk(1..3), [neg./pos side(1..2) for each dimension(1..3)](1..6)</td></tr>
      </table>
-
-        -X   -Y   -Z   +X   +Y   +Z
-      i
-      j
-      k
+     <table>
+     <tr><td></td><td>-X</td><td>-Y</td><td>-Z</td><td>+X</td><td>+Y</td><td>+Z</td></tr>
+     <tr><td>i</td></tr>
+     <tr><td>j</td></tr>
+     <tr><td>k</td></tr>
+     </table>
 
    5. gslab_end(1..3, 1..6) Relative end coord. of ghost-slab in pencil ijk(1..3), [neg./pos side(1..2) for each dimension(1..3)](1..6)
 
