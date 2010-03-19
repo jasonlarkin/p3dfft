@@ -184,7 +184,7 @@ How to use ghost cell support:
      <tr><td>k</td></tr>
      </table>
   # *gslab_size(1..3, 1..3)* Size of ghost-slab for each dimension(1..3), ijk(1..3)
-  # *gneighb_(numtasks*(3*2))* Extended processor grid with all processor neighbours in -/+XYZ(1..6) including periodic boundary neighbours.
+  # *gneighb_(numtasks x(3 x 2))* Extended processor grid with all processor neighbours in -/+XYZ(1..6) including periodic boundary neighbours.
       <table>
       <tr><td>Example for 2 processors with gneighb_r(:) = 0,0,0,0,1,1,1,1,1,1,0,0</td></tr>
       <tr><td>pencil-side: -X  +X  -Y  +Y  -Z  +Z</td></tr>
