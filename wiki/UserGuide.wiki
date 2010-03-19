@@ -24,12 +24,12 @@ You should have received a copy of the GNU General Public License along with thi
 
 ===Using the P3DFFT Library===
 
-====1. p3dfft module====
+==1. p3dfft module==
 The p3dfft module declares important variables. It should be included in any code that calls P3DFFT routines (via use p3dfft statement in Fortran).
 
 The p3dfft module also specifies mytype, which is the type of real and complex numbers. Its value of 4 corresponds to single precision and 8 for double precision. You can choose precision at compile time through a preprocessor flag (see Installation Guide).
 
-====2. Initialization====
+==2. Initialization==
 Before using the library it is necessary to call an initialization routine 'p3dfft_setup'.
 
 *Usage:* _p3dfft_setup(proc_dims,nx,ny,nz,overwrite)_
@@ -43,7 +43,7 @@ Before using the library it is necessary to call an initialization routine 'p3df
 
 To initialize ghost cells operations, a call to p3dfft_init_ghosts should be made. See example driver_ghost.f in sample/FORTRAN.
 
-====3. Array Decomposition====
+==3. Array Decomposition==
 
 The p3dfft_setup routine sets up the two-dimensional (2D) array decomposition. P3DFFT employs 2D block decomposition whereby processors are arranged into a 2D grid P1 x P2, based on their MPI rank. Two of the dimensions of the 3D grid are block-distributed across the processor grid, by assigning the blocks to tasks in the rank order. The third dimension of the grid remains undivided, i.e. contained entirely within local memory (see Fig. 1). This scheme is sometimes called pencils decomposition.
 
@@ -71,7 +71,7 @@ P3DFFT uses 2D block decomposition to assign local arrays for each task. In many
 It should be clear that the user’s choice of P1 and P2 can make a difference on how balanced is the decomposition. Obviously the greater load imbalance, the less performance can be expected.
 
 Note: the two array types are distributed among processors in a different way from each other, but this does not automatically imply anything about the ordering of the elements in memory. Memory layout of the original (ip=1) array uses the “Fortran” ordering. For example, for an array A(lx,ly,lz) the index corresponding to lx runs fastest. Memory layout for the transposed (ip=2) array type depends on how the P3DFFT library was built. By default, it preserves the ordering of the real array, i.e. (X,Y,Z). However, in many cases it is advisable to have Z dimension contiguous, i.e. a memory layout (Z,X,Y). This can speed up some computations in the wavenumber space by improving cache utilization through spatial locality in Z, and also often results in better performance of P3DFFT transforms themselves. The (Z,X,Y) layout can be triggered by building the library with –DSTRIDE1 preprocessor flag in the makefile. For more information, see performance section below.
-====4. Forward (real-to-complex) and backward (complex-to-real) 3D Fourier transforms====
+==4. Forward (real-to-complex) and backward (complex-to-real) 3D Fourier transforms==
 
 Forward transform is implemented by the p3dfft_ftran_r2c subroutine using the following format:
 
@@ -108,7 +108,7 @@ Performance is likely to be better when P3DFFT is built using –DSTRIDE1 flag. 
 
 Finally, performance will be better if overwrite parameter is set to .true. (or 1 in C) when initializing P3DFFT. This allows the library to overwrite the input array, which results in significantly faster execution when not using –DSTRIDE1 flag.
 
-====Ghost cell support====
+==Ghost cell support==
 
 Elementary ghost cell operations (nearest-neighbor/halo send-receive) are enabled in this version. See _driver_ghost.f_ in _sample/FORTRAN/_ for an example of the use.
 How to use ghost cell support:
@@ -176,27 +176,26 @@ How to use ghost cell support:
      <tr><td>j</td></tr>
      <tr><td>k</td></tr>
      </table>
+  # *gslab_end(1..3, 1..6)* Relative end coord. of ghost-slab in pencil ijk(1..3), [neg./pos side(1..2) for each dimension(1..3)](1..6)
+     <table>
+     <tr><td>-X</td><td>-Y</td><td>-Z</td><td>+X</td><td>+Y</td><td>+Z</td></tr>
+     <tr><td>i</td></tr>
+     <tr><td>j</td></tr>
+     <tr><td>k</td></tr>
+     </table>
+  # *gslab_size(1..3, 1..3)* Size of ghost-slab for each dimension(1..3), ijk(1..3)
+  # *gneighb_(numtasks*(3*2))* Extended processor grid with all processor neighbours in -/+XYZ(1..6) including periodic boundary neighbours.
+      <table>
+      <tr><td>Example for 2 processors with gneighb_r(:) = 0,0,0,0,1,1,1,1,1,1,0,0</td></tr>
+      <tr><td>pencil-side: -X  +X  -Y  +Y  -Z  +Z</td></tr>
+      <tr><td>taskid 0:     0   0   0   0   1   1</td></tr>
+      <tr><td>taskid 1:     1   1   1   1   0   0</td></tr>
+      </table>
 
-   5. gslab_end(1..3, 1..6) Relative end coord. of ghost-slab in pencil ijk(1..3), [neg./pos side(1..2) for each dimension(1..3)](1..6)
+==References==
 
-      -X   -Y   -Z   +X   +Y   +Z
-      i
-      j
-      k
+  # ESSL library, IBM, http://publib.boulder.ibm.com/infocenter/clresctr/vxrx/index.jsp?topic=/com.ibm.cluster.essl.doc/esslbooks.html
+  # Matteo Frigo and Steven G. Johnson, "The Design and Implementation of FFTW3", Proceedings of the IEEE 93 (2), 216–231 (2005). Invited paper, Special Issue on Program Generation, Optimization, and Platform Adaptation.
 
-   6. gslab_size(1..3, 1..3) Size of ghost-slab for each dimension(1..3), ijk(1..3)
-   7. gneighb_(numtasks*(3*2)) Extended processor grid with all processor neighbours in -/+XYZ(1..6) including periodic boundary neighbours.
-      Example for 2 processors with gneighb_r(:) = 0,0,0,0,1,1,1,1,1,1,0,0
-
-      pencil-side: -X  +X  -Y  +Y  -Z  +Z
-      taskid 0:     0   0   0   0   1   1
-      taskid 1:     1   1   1   1   0   0
-
-References
-
-   1. ESSL library, IBM, http://publib.boulder.ibm.com/infocenter/clresctr/vxrx/index.jsp?topic=/com.ibm.cluster.essl.doc/esslbooks.html
-   2. Matteo Frigo and Steven G. Johnson, "The Design and Implementation of FFTW3", Proceedings of the IEEE 93 (2), 216–231 (2005). Invited paper, Special Issue on Program Generation, Optimization, and Platform Adaptation.
-
-Feedback
-
+==Feedback==
 Please send your feedback, including bugs and suggestions, to Dmitry Pekurovsky, dmitry@sdsc.edu
