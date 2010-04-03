@@ -62,6 +62,7 @@ install:
 	cp $(P3DFFT_LIB) $(P3DFFT_ROOT)/lib
 	if (!(-e $(P3DFFT_ROOT)/include)) mkdir $(P3DFFT_ROOT)/include
 	cp p3dfft.mod $(P3DFFT_ROOT)/include
+	if (!(-e $(P3DFFT_ROOT)/include/p3dfft.h)) -cp ../include/p3dfft.h $(P3DFFT_ROOT)/include
 
 module.o: module.F fft_spec.o
 fft_init.o: fft_init.F module.o fft_spec.o
