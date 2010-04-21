@@ -17,5 +17,5 @@ driver_spec.o: driver_spec.f
 		$(FF) -c $(FFLAGS) -I$(P3DFFT_INC) $(INC_FFT) $<
 
 clean:
-	-/bin/rm driver*.o 
-
+	-rm -f driver*.o 
+	-rm -f test_*.x
