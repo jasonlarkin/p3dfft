@@ -5,6 +5,6 @@ LDFFLAGS= -O3 -q64 -L/usr/local/apps/fftw312s/lib -lfftw3f -L/usr/local/apps/mas
 INC_FFT = /usr/local/apps/fftw312d/include
 
 CC = mpcc_r 
-CFLAGS = -O3 -q64 -qarch=pwr4 -qtune=pwr4 -DIBM 
+CFLAGS = -O3 -q64 -qarch=pwr4 -qtune=pwr4 -DIBM -DSINGLE_PREC
 LDCFLAGS= $(LDFFLAGS) -lxlf90_r
 

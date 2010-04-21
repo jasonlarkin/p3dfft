@@ -7,5 +7,5 @@ INC_FFT = $(FFTW_INC)
 LDFFLAGS= $(FFLAGS) $(FFT_LIB)
 
 CC = cc
-CFLAGS = -fastsse -tp barcelona-64 -DPGI
+CFLAGS = -fastsse -tp barcelona-64 -DPGI -DSINGLE_PREC
 LDCFLAGS= $(CFLAGS) $(FFT_LIB) -lm -pgf90libs

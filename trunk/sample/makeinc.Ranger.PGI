@@ -7,5 +7,5 @@ INC_FFT = $(TACC_FFTW3_INC)
 LDFFLAGS= $(FFT_LIB)
 CC = mpicc
 
-CFLAGS = -fastsse -tp barcelona-64 -DPGI
+CFLAGS = -fastsse -tp barcelona-64 -DPGI -DSINGLE_PREC
 LDCFLAGS= $(LDFFLAGS) -lm
