@@ -73,23 +73,23 @@ extern void p3dfft_btran_c2r(float *A,float *B);
 
 extern void p3dfft_clean();
 
-void p3dfft_setup(int *dims,int nx,int ny,int nz, int overwrite)
+inline void p3dfft_setup(int *dims,int nx,int ny,int nz, int overwrite)
 {
   FORT_MOD_NAME(p3dfft_setup)(dims,&nx,&ny,&nz,&overwrite);
 }
 
-void get_dims(int *start,int *end,int *size,int conf)
+inline void get_dims(int *start,int *end,int *size,int conf)
 {
   FORT_MOD_NAME(get_dims)(start,end,size,&conf);
 }
 
 #ifndef SINGLE_PREC
-void p3dfft_ftran_r2c(double *A,double *B)
+inline void p3dfft_ftran_r2c(double *A,double *B)
 {
   FORT_MOD_NAME(p3dfft_ftran_r2c)(A,B);
 }
 #else
-void p3dfft_ftran_r2c(float *A,float *B)
+inline void p3dfft_ftran_r2c(float *A,float *B)
 {
   FORT_MOD_NAME(p3dfft_ftran_r2c)(A,B);
 }
@@ -97,23 +97,23 @@ void p3dfft_ftran_r2c(float *A,float *B)
 #endif
 
 #ifndef SINGLE_PREC
-void p3dfft_btran_c2r(double *A,double *B)
+inline void p3dfft_btran_c2r(double *A,double *B)
 {
   FORT_MOD_NAME(p3dfft_btran_c2r)(A,B);
 }
 #else
-void p3dfft_btran_c2r(float *A,float *B)
+inline void p3dfft_btran_c2r(float *A,float *B)
 {
   FORT_MOD_NAME(p3dfft_btran_c2r)(A,B);
 }
 #endif
 
-void p3dfft_clean()
+inline void p3dfft_clean()
 {
   FORT_MOD_NAME(p3dfft_clean)();
 }
 
-void FORTNAME(abort)() 
+inline void FORTNAME(abort)() 
 {
   abort();
 }
