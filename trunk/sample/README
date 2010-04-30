@@ -75,6 +75,7 @@ driver_spec.f - this program initializes a 3D real array, calls
   complex Fourier coefficients. 
 
 driver_ghost.f - this program illustrates the use of ghost cell features.
+  please note that ghost cell support is off by default
 
 C/ directory contains analogous programs written in C rather than Fortran. 
 
