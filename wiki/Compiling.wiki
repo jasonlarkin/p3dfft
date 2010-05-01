@@ -1,4 +1,4 @@
 #summary Compiling
 
 = How to compile on Triton using PGI =
-./configure --with-fftw3=/opt/pgi/fftw_pgi FCFLAGS=-fastsse -tp barcelona-64 -Mextend -byteswapio CFLAGS=-fastsse -tp barcelona-64 -DPGI LDFLAGS=-lmpi_f90 -lmpi_f77 -pgf90libs -lmyriexpress
+./configure --with-fftw3="/opt/pgi/fftw_pgi" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64 -DPGI" LDFLAGS="-lmpi_f90 -lmpi_f77 -pgf90libs -lmyriexpress"
