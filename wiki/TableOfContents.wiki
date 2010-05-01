@@ -1,5 +1,6 @@
 Questions or comments? Join the P3DFFT mailing list and get the answers you need.
   * [Introduction Introduction]
+  * [Compiling P3DFFT]
   * [Install Installing P3DFFT] 
   * [UserGuide User Guide]
   * [Papers Papers and Presentations]
