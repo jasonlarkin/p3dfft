@@ -4,8 +4,10 @@
 
 === How to compile on Triton using PGI ===
 _Note: You must load the module fftw first!_
+
 ./configure --with-fftw="/opt/pgi/fftw_pgi" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64 -DPGI" LDFLAGS="-lmpi_f90 -lmpi_f77 -pgf90libs -lmyriexpress"
 
 === How to compile on TACC using PGI ===
 _Note: You must load the module fftw3 first!_
+
 ./configure --with-fftw="$TACC_FFTW3_DIR" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64 -DPGI" LDFLAGS="-pgf90libs -lmyriexpress" 
