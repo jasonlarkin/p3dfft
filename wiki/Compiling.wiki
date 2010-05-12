@@ -2,12 +2,17 @@
 = How to compile P3DFFT =
 ./configure --with-fftw=<path to FFTW3 library> FCFLAGS=<Fortran compiler flags> CFLAGS=<C compiler flags> LDFLAGS=<libraries to link>
 
-=== How to compile on Triton using PGI ===
+=== How to compile on Triton for PGI ===
 _Note: You must load the module fftw first!_
 
-./configure --with-fftw="/opt/pgi/fftw_pgi" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64 -DPGI" LDFLAGS="-lmpi_f90 -lmpi_f77 -pgf90libs -lmyriexpress"
+./configure --enable-pgi="yes" --with-fftw="/opt/pgi/fftw_pgi" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77 -pgf90libs -lmyriexpress"
 
-=== How to compile on TACC using PGI ===
+=== How to compile on TACC for PGI ===
 _Note: You must load the module fftw3 first!_
 
-./configure --with-fftw="$TACC_FFTW3_DIR" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64 -DPGI" LDFLAGS="-pgf90libs" 
+./configure --enable-pgi="yes" --with-fftw="$TACC_FFTW3_DIR" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-pgf90libs" 
+
+=== How to compile on Kraken for PGI ===
+_Note: You must load the module fftw/3.1.2 first!_
+
+./configure --enable-pgi="yes" --with-fftw="/sw/xt/fftw/3.1.2/cnl2.2_pgi9.0.1" FC="ftn" CC="cc" LDFLAGS="-pgf90libs"
