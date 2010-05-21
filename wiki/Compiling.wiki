@@ -2,6 +2,8 @@
 = How to compile P3DFFT =
 ./configure --with-fftw=<path to FFTW3 library> FCFLAGS=<Fortran compiler flags> CFLAGS=<C compiler flags> LDFLAGS=<libraries to link>
 
+Use --enable-single to compile with Single Precision
+
 === How to compile on Triton for PGI ===
 _Note: You must load the module fftw first!_
 
