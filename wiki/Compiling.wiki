@@ -17,4 +17,4 @@ _Note: You must load the module fftw3 first!_
 === How to compile on Kraken for PGI ===
 _Note: You must load the module fftw/3.1.2 first!_
 
-./configure --enable-pgi="yes" --with-fftw="/sw/xt/fftw/3.1.2/cnl2.2_pgi9.0.1" FC="ftn" CC="cc" LDFLAGS="-pgf90libs"
+./configure --enable-pgi="yes" --with-fftw="$FFTWHOME" FC="ftn" CC="cc" LDFLAGS="-pgf90libs"
