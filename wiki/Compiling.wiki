@@ -7,7 +7,7 @@ Use --enable-single to compile with Single Precision
 === How to compile on Triton for PGI ===
 _Note: You must load the module fftw first!_
 
-./configure --enable-pgi="yes" --with-fftw="FFTWHOME" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77 -pgf90libs -lmyriexpress"
+./configure --enable-pgi="yes" --with-fftw="$FFTWHOME" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77 -pgf90libs -lmyriexpress"
 
 === How to compile on TACC for PGI ===
 _Note: You must load the module fftw3 first!_
