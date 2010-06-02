@@ -7,7 +7,7 @@
 || FCFLAGS=<Fortran compiler flags> || flags to use with Fortran compiler || 
 || CFLAGS=<C compiler flags> || flags to use with C compiler ||
 || LDFLAGS=<libraries to link> || additional linker flags ||
-<p>
+
 = Compiling on Triton =
 || *Compiler* || *Modules* || *Arguments* ||
 || PGI || pgi, fftw, mpi || ./configure --enable-pgi --with-fftw="$FFTWHOME" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77 -pgf90libs -lmyriexpress" ||
