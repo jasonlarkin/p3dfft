@@ -8,20 +8,17 @@
 || CFLAGS=<C compiler flags> || flags to use with C compiler ||
 || LDFLAGS=<libraries to link> || additional linker flags ||
 
-=== Compiling on Triton ===
-
+= Compiling on Triton =
 || *Compiler* || *Modules* || *Arguments* ||
 || PGI || pgi, fftw, mpi || ./configure --enable-pgi --with-fftw="$FFTWHOME" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77 -pgf90libs -lmyriexpress" ||
 || Intel || intel, fftw, mpi || ./configure --enable-intel --enable-dstride1 --with-fftw="$FFTWHOME" FCFLAGS="-O3 -xW -132 -fpp" CFLAGS="-O3 -xW" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress" ||
 || GCC || gnu, fftw, mpi || ./configure --enable-gcc --with-fftw="$FFTWHOME" LDFLAGS="-lmpi_f90 -lmpi_f77" || 
 
 
-=== How to compile on TACC for PGI ===
-_Note: You must load the module fftw3 first!_
+= Compiling on TACC =
+|| *Compiler* || *Modules* || *Arguments* ||
+|| PGI || pgi, fftw, mpi || ./configure --enable-pgi="yes" --with-fftw="$TACC_FFTW3_DIR" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-pgf90libs" || 
 
-./configure --enable-pgi="yes" --with-fftw="$TACC_FFTW3_DIR" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-pgf90libs" 
-
-=== How to compile on Kraken for PGI ===
-_Note: You must load the module fftw first!_
-
-./configure --enable-fftw --with-fftw="$FFTW_DIR/.." --enable-useeven --enable-stride1 --enable-pgi FC=ftn FCFLAGS="-fastsse -tp istanbul-64 -Mextend -byteswapio"  CC=cc CFLAGS="-fastsse -tp istanbul-64"
+= Compiling on Kraken =
+|| *Compiler* || *Modules* || *Arguments* ||
+|| PGI || pgi, fftw, mpi || ./configure --enable-fftw --with-fftw="$FFTW_DIR/.." --enable-useeven --enable-stride1 --enable-pgi FC=ftn FCFLAGS="-fastsse -tp istanbul-64 -Mextend -byteswapio"  CC=cc CFLAGS="-fastsse -tp istanbul-64" ||
