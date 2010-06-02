@@ -1,6 +1,11 @@
 #summary Compiling
 = How to compile P3DFFT =
-./configure --with-fftw=<path to FFTW3 library> FCFLAGS=<Fortran compiler flags> CFLAGS=<C compiler flags> LDFLAGS=<libraries to link>
+|| Flags || Description ||
+|| --enable-fftw || enables the use of the FFTW library ||
+|| --with-fftw=<path to FFTW3 library> || path to FFTW library ||
+|| FCFLAGS=<Fortran compiler flags> || flags to use with Fortran compiler || 
+|| CFLAGS=<C compiler flags> || flags to use with C compiler ||
+|| LDFLAGS=<libraries to link> || additional linker flags ||
 
 Use --enable-single to compile with Single Precision
 
