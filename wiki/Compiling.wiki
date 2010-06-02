@@ -1,5 +1,7 @@
 #summary Compiling
 = How to compile P3DFFT =
+P3DFFT uses a configure script to create Makefiles for compiling the library as well as several examples. This page will step you through the process of running the configure script properly.
+
 || *Flags* || *Description* ||
 || --enable-single || compiles P3DFFT in single-precision ||
 || --enable-fftw || enables the use of the FFTW library ||
