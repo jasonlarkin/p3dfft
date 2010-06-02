@@ -1,12 +1,7 @@
 #summary How to install P3DFFT
-== Introduction == 
-P3DFFT uses FFTW3 and MPI.
-
-== Requirements == 
-P3DFFT can be run on any parallel platform with support for Fortran 90 and MPI. It is also necessary that one of the two serial FFT libraries be installed on the system: IBM’s [http://www-03.ibm.com/systems/p/software/essl.html Engineering and Scientific Software Library] ([http://www-03.ibm.com/systems/p/software/essl.html ESSL]) or [http://fftw.org/ Fastest Fourier Transform in the West] ([http://fftw.org/ FFTW]).
-
-== Downloading Directly == 
-You can get the latest release of P3DFFT from [http://p3dfft.googlecode.com/files/p3dfft.tar here].
-
-== Building P3DFFT == 
-Coming soon.
+== Installing P3DFFT ==
+The latest version of P3DFFT can be found here. Once you have extracted the package, you must take the following steps to complete the setup:
+ 
+1. [Compile Run the configure script]
+2. Run 'make'
+3. Run 'make install'
