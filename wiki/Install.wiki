@@ -2,9 +2,9 @@
 == Installing P3DFFT ==
 The latest version of P3DFFT can be found here. Once you have extracted the package, you must take the following steps to complete the setup:
  
-# Run the configure script
-# Run 'make'
-# Run 'make install'
+ # Run the configure script
+ # Run 'make'
+ # Run 'make install'
 
 = How to compile P3DFFT =
 P3DFFT uses a configure script to create Makefiles for compiling the library as well as several examples. This page will step you through the process of running the configure script properly.
