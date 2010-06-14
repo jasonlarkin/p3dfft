@@ -1,3 +1,3 @@
 #summary Papers and Presentations for P3DFFT
 
-Supercomputing'08 [poster presentation]
+[SC08_poster Supercomputing'08 poster presentation]
