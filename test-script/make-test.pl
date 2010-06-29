@@ -16,7 +16,7 @@ if (!-e "variables.pl") {
 # import variables
 do 'variables.pl';
 
-if (!defined($P3DFFT_CONFIGURE) || !defined($P3DFFT_CONFIGURE2) || !defined($DIMS) || !defined($TEST_PATH)) {
+if (!defined($DIMS) || !defined($TEST_PATH)) {
 	die "Please check your variables.pl and make sure all variables are defined!";
 }
 
@@ -47,48 +47,36 @@ system("chmod +x src/configure");
 print "Settings DIMS to $DIMS\n";
 system("echo $DIMS > src/sample/dims");
 
-print "Copying src to test1\n";
-system("cp -ar src test1");
-
-print "Copying src to test2\n";
-system("cp -ar src test2");
+for ($count = 0; $count < $total_tests; $count++) {
+	print "Copying src to test$count\n";
+	system("cp -ar src test$count");
+}
 
 print "======================================================\n";
 print "                  Begin configure and build\n";
 print "======================================================\n\n";
 
-# Test 1
 
-chdir("$cwd/test1");
+for ($count = 0; $count < $total_tests; $count++) {
+	chdir("$cwd/test$count");
+	$P3DFFT_CONFIGURE = $CONFIGURE[$count];
 
-print "Configuring test1\n$P3DFFT_CONFIGURE\n";
-$configure_status = system("$P3DFFT_CONFIGURE");
-if ($configure_status > 0) {
-	die("\n\nConfigure test1 failed: $P3DFFT_CONFIGURE\n\n");
-}
+	print "Configuring test$count\n$P3DFFT_CONFIGURE\n";
+	$configure_status = system("$P3DFFT_CONFIGURE");
+	if ($configure_status > 0) {
+		die("\n\nConfigure test$count failed: $P3DFFT_CONFIGURE\n\n");
+	}
 
-#system("mv $cwd/test1/sample/FORTRAN/*.x
+	print "Running make test$count...\n";
+	$make_status = system("make");
+	if ($make_status > 0) {
+		die("\n\nMake test$count failed, please see above\n\n");
+	}
 
-print "Running make test1...\n";
-$make_status = system("make");
-if ($make_status > 0) {
-	die("\n\nMake test1 failed, please see above\n\n");
-}
-
-## Test 2
-
-chdir("$cwd/test2");
-
-print "Configuring test2\n$P3DFFT_CONFIGURE2\n";
-$configure_status = system("$P3DFFT_CONFIGURE2");
-if ($configure_status > 0) {
-        die("\n\nConfigure test2 failed: $P3DFFT_CONFIGURE2\n\n");
-}
-
-print "Running make test2...\n";
-$make_status = system("make");
-if ($make_status > 0) {
-        die("\n\nMake test2 failed, please see above\n\n");
+	chdir("$cwd/test$count/sample/C");
+	system("mv *.x $cwd/test$count/sample");
+	chdir("$cwd/test$count/sample/FORTRAN"); 
+	system("mv *.x $cwd/test$count/sample/");
 }
 
 print "Run tests? [yes]: ";
@@ -108,5 +96,11 @@ print "======================================================\n";
 print "                  Begin tests\n";
 print "======================================================\n\n";
 
-chdir("$cwd/test1/sample");
+for ($count = 0; $count < $total_tests; $count++) {
+	chdir("$cwd/test$count/sample");
+	@tests = glob ("*f.x*");
+	foreach (@tests) {
+		system("mpirun -np $NUM_PROC $_");
+	}
+}
 
