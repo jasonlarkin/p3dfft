@@ -4,7 +4,6 @@
 #
 #
 
-system("module load fftw");
 
 # test path can be the name of a folder relative 
 # to the directory this file is in or it can be
