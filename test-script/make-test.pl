@@ -30,6 +30,17 @@ if (!-d $TEST_PATH) {
 	system("mkdir $TEST_PATH");
 }
 
+# make $JOB_PATH if not exists or clean it if it does
+if (!-d $JOB_PATH) {
+	print "JOB_PATH does not exist, creating...\n";
+	system("mkdir $JOB_PATH");
+} else {
+	print "JOB_PATH exists, removing files\n";
+	system("rm -rf $JOB_PATH");
+	system("mkdir $JOB_PATH");
+}
+
+
 chdir($TEST_PATH);
 
 $cwd = getcwd();
@@ -96,11 +107,31 @@ print "======================================================\n";
 print "                  Begin tests\n";
 print "======================================================\n\n";
 
+open(QSUB, ">$cwd/batch.sh");
+
+print QSUB "#!/bin/csh\n";
+print QSUB "#PBS -q $QUEUE\n";
+print QSUB "#PBS -N $JOB_NAME\n";
+print QSUB "#PBS -l nodes=$NODES:ppn=$PROCS_NODE\n";
+print QSUB "#PBS -l walltime=$WALLTIME\n";
+print QSUB "#PBS -V\n";
+print QSUB "#PBS -M $EMAIL\n";
+print QSUB "#PBS -m abe\n";
+print QSUB "cd $JOB_PATH\n";
+
 for ($count = 0; $count < $total_tests; $count++) {
 	chdir("$cwd/test$count/sample");
+	print QSUB "cd $JOB_PATH/test$count/sample\n";
 	@tests = glob ("*f.x*");
 	foreach (@tests) {
-		system("mpirun -np $NUM_PROC $_");
+		print QSUB "mpirun -np $NUM_PROC $_\n";
 	}
 }
 
+close(QSUB);
+
+print "Moving files\n";
+print "mv $cwd/* $JOB_PATH/\n";
+system("mv $cwd/* $JOB_PATH/");
+
+print "\nScript Finished!\n";
