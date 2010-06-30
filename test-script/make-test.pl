@@ -50,7 +50,7 @@ print "                  Begin Setup\n";
 print "======================================================\n\n";
 
 print "Getting P3DFFT source from SVN\n";
-system("svn checkout http://p3dfft.googlecode.com/svn/branches/p3dfft-f90 src");
+system("svn checkout http://p3dfft.googlecode.com/svn/trunk src");
 
 print "CHMOD configure to executable\n";
 system("chmod +x src/configure");
@@ -100,7 +100,7 @@ if ($_ eq "") {
 } elsif ($_ eq "yes") {
 # continue
 } else {
-	print "Script ended\n";
+	die "Script aborted\n";
 }
 
 print "======================================================\n";
@@ -117,13 +117,19 @@ print QSUB "#PBS -l walltime=$WALLTIME\n";
 print QSUB "#PBS -V\n";
 print QSUB "#PBS -M $EMAIL\n";
 print QSUB "#PBS -m abe\n";
+print QSUB "#PBS -o /mirage/djchen/output\n";
+print QSUB "#PBS -e /mirage/djchen/error\n";
+
 print QSUB "cd $JOB_PATH\n";
 
 for ($count = 0; $count < $total_tests; $count++) {
 	chdir("$cwd/test$count/sample");
 	print QSUB "cd $JOB_PATH/test$count/sample\n";
-	@tests = glob ("*f.x*");
+	@tests = glob ("*.x");
 	foreach (@tests) {
+		print QSUB "echo ======================================================\n";
+		print QSUB "echo Starting $_\n";
+		print QSUB "echo ======================================================\n";
 		print QSUB "mpirun -np $NUM_PROC $_\n";
 	}
 }
@@ -133,5 +139,21 @@ close(QSUB);
 print "Moving files\n";
 print "mv $cwd/* $JOB_PATH/\n";
 system("mv $cwd/* $JOB_PATH/");
+
+print "Submit tests to queue? [yes]: ";
+$| = 1;               # force a flush after our print
+$_ = <STDIN>;         # get the input from STDIN (presumably the keyboard)
+chomp;
+
+if ($_ eq "") {
+	die "Script aborted\n";
+} elsif ($_ eq "yes") {
+# continue
+} else {
+        die "Script aborted\n";
+}
+
+chdir("$JOB_PATH");
+system("qsub batch.sh");
 
 print "\nScript Finished!\n";
