@@ -31,7 +31,7 @@ P3DFFT uses a configure script to create Makefiles for compiling the library as 
 
 = Compiling on TACC =
 || *Compiler* || *Modules* || *Arguments* ||
-|| PGI || pgi, fftw, mpi || ./configure --enable-pgi --with-fftw="$TACC_FFTW3_DIR" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77" || 
+|| PGI || fftw3 || ./configure --enable-pgi --with-fftw="$TACC_FFTW3_DIR" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77" || 
 
 = Compiling on Kraken =
 || *Compiler* || *Modules* || *Arguments* ||
