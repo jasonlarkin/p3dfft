@@ -4,6 +4,8 @@
 #
 #
 
+# LOAD FFTW
+system("/opt/modules/Modules/3.2.5/bin/modulecmd csh load fftw > /dev/null");
 
 # test path can be the name of a folder relative 
 # to the directory this file is in or it can be
@@ -34,7 +36,10 @@ $JOB_NAME = "p3dfft-test";
 # path where the job will run from 
 # NO TRAILING SLASH!
 $JOB_PATH = "/mirage/djchen/p3dfft-test";
+# path where the job logs will be stored
+# NO TRAILING SLASH!
+$OUTPUT_PATH = "/mirage/djchen/logs";
 
-# double precision (default)
+# double precision, single precision
 @CONFIGURE = ('./configure --enable-pgi --enable-fftw --with-fftw="$FFTWHOME" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress"',
 './configure --enable-pgi --enable-single --enable-fftw --with-fftw=/home/djchen/build/fftw/ FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress"');

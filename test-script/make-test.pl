@@ -40,6 +40,15 @@ if (!-d $JOB_PATH) {
 	system("mkdir $JOB_PATH");
 }
 
+# make $OUTPUT_PATH if not exists or clean it if it does
+if (!-d $OUTPUT_PATH) {
+	print "OUTPUT_PATH does not exist, creating...\n";
+	system("mkdir $OUTPUT_PATH");
+} else {
+	print "OUTPUT_PATH exists, removing files\n";
+	system("rm -rf $OUTPUT_PATH");
+	system("mkdir $OUTPUT_PATH");
+}
 
 chdir($TEST_PATH);
 
@@ -117,8 +126,8 @@ print QSUB "#PBS -l walltime=$WALLTIME\n";
 print QSUB "#PBS -V\n";
 print QSUB "#PBS -M $EMAIL\n";
 print QSUB "#PBS -m abe\n";
-print QSUB "#PBS -o /mirage/djchen/output\n";
-print QSUB "#PBS -e /mirage/djchen/error\n";
+print QSUB "#PBS -o $OUTPUT_PATH/output\n";
+print QSUB "#PBS -e $OUTPUT_PATH/error\n";
 
 print QSUB "cd $JOB_PATH\n";
 
@@ -130,14 +139,13 @@ for ($count = 0; $count < $total_tests; $count++) {
 		print QSUB "echo ======================================================\n";
 		print QSUB "echo Starting $_\n";
 		print QSUB "echo ======================================================\n";
-		print QSUB "mpirun -np $NUM_PROC $_\n";
+		print QSUB "mpirun -np $NUM_PROC $_ > $OUTPUT_PATH/$_.log\n";
 	}
 }
 
 close(QSUB);
 
-print "Moving files\n";
-print "mv $cwd/* $JOB_PATH/\n";
+print "Moving files to $JOB_PATH\n";
 system("mv $cwd/* $JOB_PATH/");
 
 print "Submit tests to queue? [yes]: ";
