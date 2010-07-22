@@ -3,9 +3,13 @@
 #	Test Script for P3DFFT
 #
 #
+sub system_bash {
+  my @args = ( "bash", "-c", shift );
+  system(@args);
+}
 
 # LOAD FFTW
-system("/opt/modules/Modules/3.2.5/bin/modulecmd csh load fftw > /dev/null");
+system_bash("/opt/modules/Modules/3.2.5/bin/modulecmd bash load fftw");
 
 # test path can be the name of a folder relative 
 # to the directory this file is in or it can be
