@@ -16,8 +16,14 @@ if (!-e "variables.pl") {
 # import variables
 do 'variables.pl';
 
+
 if (!defined($DIMS) || !defined($TEST_PATH)) {
 	die "Please check your variables.pl and make sure all variables are defined!";
+}
+
+$total_tests2 = @CONFIGURE;
+if ($total_tests == 0) {
+	$total_tests = $total_tests2;
 }
 
 # clean TEST_PATH or create it if it doesnt exist
@@ -78,25 +84,61 @@ print "======================================================\n\n";
 
 
 for ($count = 0; $count < $total_tests; $count++) {
-	chdir("$cwd/test$count");
+	chdir("$cwd");
+	system("cp -ar test$count test$count-even");
+	system("cp -ar test$count test$count-stride1");
 	$P3DFFT_CONFIGURE = $CONFIGURE[$count];
 
+	
+	chdir("$cwd/test$count");
 	print "Configuring test$count\n$P3DFFT_CONFIGURE\n";
 	$configure_status = system("$P3DFFT_CONFIGURE");
 	if ($configure_status > 0) {
 		die("\n\nConfigure test$count failed: $P3DFFT_CONFIGURE\n\n");
 	}
-
 	print "Running make test$count...\n";
 	$make_status = system("make");
 	if ($make_status > 0) {
 		die("\n\nMake test$count failed, please see above\n\n");
 	}
-
 	chdir("$cwd/test$count/sample/C");
-	system("mv *.x $cwd/test$count/sample");
-	chdir("$cwd/test$count/sample/FORTRAN"); 
-	system("mv *.x $cwd/test$count/sample/");
+        system("mv *.x $cwd/test$count/sample");
+        chdir("$cwd/test$count/sample/FORTRAN");
+        system("mv *.x $cwd/test$count/sample/");
+
+	chdir("$cwd/test$count-even");
+	print "Configuring test$count-even\n$P3DFFT_CONFIGURE --enable-useeven\n";
+	$configure_status = system("$P3DFFT_CONFIGURE --enable-useeven");
+	if ($configure_status > 0) {
+		die("\n\nConfigure test$count-even failed: $P3DFFT_CONFIGURE --enable-useeven\n\n");
+	}
+        print "Running make test$count-even...\n";
+        $make_status = system("make");
+        if ($make_status > 0) {
+                die("\n\nMake test$count-even failed, please see above\n\n");
+        }
+        chdir("$cwd/test$count-even/sample/C");
+        system("mv *.x $cwd/test$count-even/sample");
+        chdir("$cwd/test$count-even/sample/FORTRAN");
+        system("mv *.x $cwd/test$count-even/sample/");
+
+	chdir("$cwd/test$count-stride1");
+	print "Configuring test$count-stride1\n$P3DFFT_CONFIGURE --enable-stride1\n";
+	$configure_status = system("$P3DFFT_CONFIGURE --enable-stride1");
+	if ($configure_status > 0) {
+		die("\n\nConfigure test$count-stride1 failed: $P3DFFT_CONFIGURE --enable-stride1\n\n");
+	}
+        print "Running make test$count-stride1...\n";
+        $make_status = system("make");
+        if ($make_status > 0) {
+                die("\n\nMake test$count-stride1 failed, please see above\n\n");
+        }
+        chdir("$cwd/test$count-stride1/sample/C");
+        system("mv *.x $cwd/test$count-stride1/sample");
+        chdir("$cwd/test$count-stride1/sample/FORTRAN");
+        system("mv *.x $cwd/test$count-stride1/sample/");
+
+
 }
 
 print "Run tests? [yes]: ";
@@ -139,7 +181,7 @@ for ($count = 0; $count < $total_tests; $count++) {
 		print QSUB "echo ======================================================\n";
 		print QSUB "echo Starting $_\n";
 		print QSUB "echo ======================================================\n";
-		print QSUB "mpirun -np $NUM_PROC $_ > $OUTPUT_PATH/$_.log\n";
+		print QSUB "mpirun -np $NUM_PROC $_ > $OUTPUT_PATH/test$count-$_.log\n";
 	}
 }
 

@@ -3,13 +3,6 @@
 #	Test Script for P3DFFT
 #
 #
-sub system_bash {
-  my @args = ( "bash", "-c", shift );
-  system(@args);
-}
-
-# LOAD FFTW
-system_bash("/opt/modules/Modules/3.2.5/bin/modulecmd bash load fftw");
 
 # test path can be the name of a folder relative 
 # to the directory this file is in or it can be
@@ -19,7 +12,7 @@ $TEST_PATH = "p3dfft-test";
 
 # total tests
 # set to 0 to run all
-$total_tests = 2;
+$total_tests = 0;
 
 # dims X Y #  X*Y must equal $NUM_PROC
 $DIMS = "2 2";
@@ -34,7 +27,7 @@ $NODES = "1";
 # processors per node
 $PROCS_NODE = "4";
 # walltime
-$WALLTIME = "0:05:00";
+$WALLTIME = "0:03:00";
 # job name
 $JOB_NAME = "p3dfft-test";
 # path where the job will run from 
@@ -45,5 +38,5 @@ $JOB_PATH = "/mirage/djchen/p3dfft-test";
 $OUTPUT_PATH = "/mirage/djchen/logs";
 
 # double precision, single precision
-@CONFIGURE = ('./configure --enable-pgi --enable-fftw --with-fftw="$FFTWHOME" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress"',
-'./configure --enable-pgi --enable-single --enable-fftw --with-fftw=/home/djchen/build/fftw/ FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress"');
+@CONFIGURE = ('./configure --enable-pgi --enable-fftw --with-fftw="/home/djchen/build/fftw/" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress"',
+'./configure --enable-pgi --enable-fftw --with-fftw="/home/djchen/build/fftw/" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress"');
