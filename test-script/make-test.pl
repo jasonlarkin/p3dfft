@@ -147,10 +147,10 @@ for ($count = 0; $count < $total_tests; $count++) {
 		print QSUB "cd $JOB_PATH/test$count-$name/sample\n";
 		@tests = glob ("*.x");
 		foreach (@tests) {
-			print QSUB "echo ======================================================\n";
-			print QSUB "echo Starting $_\n";
-			print QSUB "echo ======================================================\n";
 			for ($dims_count = 0; $dims_count < @DIMS_OPTIONS; $dims_count++) {
+				print QSUB "echo ======================================================\n";
+				print QSUB "echo Starting $_ test$count-$name-$dims\n";
+				print QSUB "echo ======================================================\n";
 				$dims_np = $DIMS_OPTIONS[$dims_count][0];
 				$dims = $DIMS_OPTIONS[$dims_count][1];
 				$dims =~ s/ /_/;
