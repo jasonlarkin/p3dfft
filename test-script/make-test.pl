@@ -73,71 +73,37 @@ system("chmod +x src/configure");
 print "Settings DIMS to $DIMS\n";
 system("echo $DIMS > src/sample/dims");
 
-for ($count = 0; $count < $total_tests; $count++) {
-	print "Copying src to test$count\n";
-	system("cp -ar src test$count");
-}
-
 print "======================================================\n";
 print "                  Begin configure and build\n";
 print "======================================================\n\n";
 
 
 for ($count = 0; $count < $total_tests; $count++) {
-	chdir("$cwd");
-	system("cp -ar test$count test$count-even");
-	system("cp -ar test$count test$count-stride1");
 	$P3DFFT_CONFIGURE = $CONFIGURE[$count];
-
 	
-	chdir("$cwd/test$count");
-	print "Configuring test$count\n$P3DFFT_CONFIGURE\n";
-	$configure_status = system("$P3DFFT_CONFIGURE");
-	if ($configure_status > 0) {
-		die("\n\nConfigure test$count failed: $P3DFFT_CONFIGURE\n\n");
-	}
-	print "Running make test$count...\n";
-	$make_status = system("make");
-	if ($make_status > 0) {
-		die("\n\nMake test$count failed, please see above\n\n");
-	}
-	chdir("$cwd/test$count/sample/C");
-        system("mv *.x $cwd/test$count/sample");
-        chdir("$cwd/test$count/sample/FORTRAN");
-        system("mv *.x $cwd/test$count/sample/");
+	for ($sub = 0; $sub < @CONFIGURE_OPTIONS; $sub++) {
+		$name = $CONFIGURE_OPTIONS[$sub][0];
+		$flag = $CONFIGURE_OPTIONS[$sub][1];
 
-	chdir("$cwd/test$count-even");
-	print "Configuring test$count-even\n$P3DFFT_CONFIGURE --enable-useeven\n";
-	$configure_status = system("$P3DFFT_CONFIGURE --enable-useeven");
-	if ($configure_status > 0) {
-		die("\n\nConfigure test$count-even failed: $P3DFFT_CONFIGURE --enable-useeven\n\n");
-	}
-        print "Running make test$count-even...\n";
-        $make_status = system("make");
-        if ($make_status > 0) {
-                die("\n\nMake test$count-even failed, please see above\n\n");
-        }
-        chdir("$cwd/test$count-even/sample/C");
-        system("mv *.x $cwd/test$count-even/sample");
-        chdir("$cwd/test$count-even/sample/FORTRAN");
-        system("mv *.x $cwd/test$count-even/sample/");
+		chdir("$cwd");
+		system("cp -ar src test$count-$name");
 
-	chdir("$cwd/test$count-stride1");
-	print "Configuring test$count-stride1\n$P3DFFT_CONFIGURE --enable-stride1\n";
-	$configure_status = system("$P3DFFT_CONFIGURE --enable-stride1");
-	if ($configure_status > 0) {
-		die("\n\nConfigure test$count-stride1 failed: $P3DFFT_CONFIGURE --enable-stride1\n\n");
+		chdir("$cwd/test$count-$name");
+		print "Configuring test$count-$name\n$P3DFFT_CONFIGURE $flag\n";
+		$configure_status = system("$P3DFFT_CONFIGURE $flag");
+		if ($configure_status > 0) {
+			die("\n\nConfigure test$count-$name failed: $P3DFFT_CONFIGURE $flag\n\n");
+		}
+        	print "Running make test$count-$name...\n";
+	        $make_status = system("make");
+        	if ($make_status > 0) {
+	                die("\n\nMake test$count-$name failed, please see above\n\n");
+        	}
+	        chdir("$cwd/test$count-$name/sample/C");
+	        system("mv *.x $cwd/test$count-$name/sample");
+	        chdir("$cwd/test$count-$name/sample/FORTRAN");
+	        system("mv *.x $cwd/test$count-$name/sample/");
 	}
-        print "Running make test$count-stride1...\n";
-        $make_status = system("make");
-        if ($make_status > 0) {
-                die("\n\nMake test$count-stride1 failed, please see above\n\n");
-        }
-        chdir("$cwd/test$count-stride1/sample/C");
-        system("mv *.x $cwd/test$count-stride1/sample");
-        chdir("$cwd/test$count-stride1/sample/FORTRAN");
-        system("mv *.x $cwd/test$count-stride1/sample/");
-
 
 }
 
@@ -174,14 +140,24 @@ print QSUB "#PBS -e $OUTPUT_PATH/error\n";
 print QSUB "cd $JOB_PATH\n";
 
 for ($count = 0; $count < $total_tests; $count++) {
-	chdir("$cwd/test$count/sample");
-	print QSUB "cd $JOB_PATH/test$count/sample\n";
-	@tests = glob ("*.x");
-	foreach (@tests) {
-		print QSUB "echo ======================================================\n";
-		print QSUB "echo Starting $_\n";
-		print QSUB "echo ======================================================\n";
-		print QSUB "mpirun -np $NUM_PROC $_ > $OUTPUT_PATH/test$count-$_.log\n";
+	for ($sub = 0; $sub < @CONFIGURE_OPTIONS; $sub++) {
+		$name = $CONFIGURE_OPTIONS[$sub][0];
+		$flag = $CONFIGURE_OPTIONS[$sub][1];
+		chdir("$cwd/test$count-$name/sample");
+		print QSUB "cd $JOB_PATH/test$count-$name/sample\n";
+		@tests = glob ("*.x");
+		foreach (@tests) {
+			print QSUB "echo ======================================================\n";
+			print QSUB "echo Starting $_\n";
+			print QSUB "echo ======================================================\n";
+			for ($dims_count = 0; $dims_count < @DIMS_OPTIONS; $dims_count++) {
+				$dims_np = $DIMS_OPTIONS[$dims_count][0];
+				$dims = $DIMS_OPTIONS[$dims_count][1];
+				$dims =~ s/ /_/;
+				print QSUB "echo $DIMS_OPTIONS[$dims_count][1] > dims\n";
+				print QSUB "mpirun -np $dims_np $_ > $OUTPUT_PATH/test$count-$name-$dims-$_.log\n";
+			}
+		}
 	}
 }
 

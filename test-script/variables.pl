@@ -27,7 +27,7 @@ $NODES = "1";
 # processors per node
 $PROCS_NODE = "4";
 # walltime
-$WALLTIME = "0:03:00";
+$WALLTIME = "0:60:00";
 # job name
 $JOB_NAME = "p3dfft-test";
 # path where the job will run from 
@@ -40,3 +40,7 @@ $OUTPUT_PATH = "/mirage/djchen/logs";
 # double precision, single precision
 @CONFIGURE = ('./configure --enable-pgi --enable-fftw --with-fftw="/home/djchen/build/fftw/" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress"',
 './configure --enable-pgi --enable-fftw --with-fftw="/home/djchen/build/fftw/" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress"');
+
+@CONFIGURE_OPTIONS = (['default',' '],['even','--enable-useeven'],['stride1','--enable-stride1'],['even-stride1','--enable-useeven --enable-stride1']);
+
+@DIMS_OPTIONS = (['4','2 2'],['4','1 4'],['4','4 1'],['1','1 1'],['2','2 1'],['2','1 2']);
