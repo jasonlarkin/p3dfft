@@ -37,4 +37,4 @@ P3DFFT uses a configure script to create Makefiles for compiling the library as 
 
 = Compiling on NCSA (Abe) =
 || *Compiler* || *SoftEnv Key* || *Arguments* ||
-|| Intel || +fftw-3.1-intel, +openmpi-1.3.2-intel || ./configure --enable-intel --enable-fftw --enable-dstride1 --with-fftw="$FFTW_HOME" FCFLAGS="-O3 -xW -132 -fpp" CFLAGS="-O3 -xW" LDFLAGS="-lmpi_f90 -lmpi_f77 -limf" ||
+|| Intel || +fftw-3.1-intel, +openmpi-1.3.2-intel || ./configure --enable-intel --enable-fftw --enable-dstride1 --with-fftw="$FFTW_HOME" FCFLAGS="-O3 -xW -132 -fpp -vec_report0" CFLAGS="-O3 -xW -vec_report0" LDFLAGS="-lmpi_f90 -lmpi_f77 -limf" ||
