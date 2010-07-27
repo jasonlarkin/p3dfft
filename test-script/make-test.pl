@@ -17,7 +17,7 @@ if (!-e "variables.pl") {
 do 'variables.pl';
 
 
-if (!defined($DIMS) || !defined($TEST_PATH)) {
+if (!defined($TEST_PATH)) {
 	die "Please check your variables.pl and make sure all variables are defined!";
 }
 
@@ -69,9 +69,6 @@ system("svn checkout http://p3dfft.googlecode.com/svn/trunk src");
 
 print "CHMOD configure to executable\n";
 system("chmod +x src/configure");
-
-print "Settings DIMS to $DIMS\n";
-system("echo $DIMS > src/sample/dims");
 
 print "======================================================\n";
 print "                  Begin configure and build\n";
@@ -155,7 +152,12 @@ for ($count = 0; $count < $total_tests; $count++) {
 				$dims = $DIMS_OPTIONS[$dims_count][1];
 				$dims =~ s/ /_/;
 				print QSUB "echo $DIMS_OPTIONS[$dims_count][1] > dims\n";
-				print QSUB "mpirun -np $dims_np $_ > $OUTPUT_PATH/test$count-$name-$dims-$_.log\n";
+				for ($stdin_count = 0; $stdin_count < @STDIN_OPTIONS; $stdin_count++) {
+					$stdin = $STDIN_OPTIONS[$stdin_count];
+					$stdin =~ s/ /_/g;
+					print QSUB "echo $STDIN_OPTIONS[$stdin_count] > stdin\n";
+					print QSUB "mpirun -np $dims_np $_ > $OUTPUT_PATH/t$count-$name-$dims-$stdin-$_.log\n";
+				}
 			}
 		}
 	}
