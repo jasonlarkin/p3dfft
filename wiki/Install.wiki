@@ -20,7 +20,7 @@ P3DFFT uses a configure script to create Makefiles for compiling the library as 
 = Compiling on Triton =
 || *Compiler* || *Modules* || *Arguments* ||
 || PGI || pgi, fftw, mpi || ./configure --enable-pgi --enable-fftw --with-fftw="$FFTWHOME" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -Mpreprocess -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress" ||
-|| Intel || intel, fftw, mpi || ./configure --enable-intel --enable-fftw --enable-dstride1 --with-fftw="$FFTWHOME" FCFLAGS="-O3 -xW -132 -fpp" CFLAGS="-O3 -xW" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress -limf" ||
+|| Intel || intel, fftw, mpi || ./configure --enable-intel --enable-fftw --enable-stride1 --with-fftw="$FFTWHOME" FCFLAGS="-O3 -xW -132 -fpp" CFLAGS="-O3 -xW" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress -limf" ||
 || GCC || gnu, fftw, mpi || ./configure --enable-gcc --enable-fftw --with-fftw="$FFTWHOME" LDFLAGS="-lmpi_f90 -lmpi_f77" || 
 
 = Compiling on IBM =
