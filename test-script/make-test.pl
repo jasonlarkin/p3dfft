@@ -156,7 +156,10 @@ for ($count = 0; $count < $total_tests; $count++) {
 					$stdin = $STDIN_OPTIONS[$stdin_count];
 					$stdin =~ s/ /_/g;
 					print QSUB "echo $STDIN_OPTIONS[$stdin_count] > stdin\n";
-					print QSUB "mpirun -np $dims_np $_ > $OUTPUT_PATH/t$count-$name-$dims-$stdin-$_.log\n";
+					print QSUB "set a = `mpirun -np $dims_np $_ > $OUTPUT_PATH/t$count-$name-$dims-$stdin-$_.log`\n";
+					#print QSUB "if(\$a > 0) then\n"
+					#print QSUB "echo error\n";
+					#print QSUB "endif\n"
 				}
 			}
 		}
