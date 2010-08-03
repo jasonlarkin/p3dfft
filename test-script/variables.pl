@@ -12,7 +12,7 @@ $TEST_PATH = "p3dfft-test";
 
 # total tests
 # set to 0 to run all
-$total_tests = 1;
+$total_tests = 0;
 
 # email address
 $EMAIL = 'djchen@ucsd.edu';
@@ -23,7 +23,7 @@ $NODES = "1";
 # processors per node
 $PROCS_NODE = "6";
 # walltime
-$WALLTIME = "0:60:00";
+$WALLTIME = "0:10:00";
 # job name
 $JOB_NAME = "p3dfft-test";
 # path where the job will run from 
@@ -33,10 +33,16 @@ $JOB_PATH = "/mirage/djchen/p3dfft-test";
 # NO TRAILING SLASH!
 $OUTPUT_PATH = "/mirage/djchen/logs";
 
+# using PGI, FFTW
 # double precision, single precision
 @CONFIGURE = (
-#'./configure --enable-pgi --enable-fftw --with-fftw="/home/djchen/build/fftw/" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -Mpreprocess -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress"',
+'./configure --enable-pgi --enable-fftw --with-fftw="/home/djchen/build/fftw/" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -Mpreprocess -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress"',
 './configure --enable-pgi --enable-single --enable-fftw --with-fftw="/home/djchen/build/fftw/" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -Mpreprocess -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress"');
+
+# using Intel, FFTW
+#@CONFIGURE = (
+#'./configure --enable-intel --enable-fftw --with-fftw="$FFTWHOME" FCFLAGS="-O3 -xW -132 -fpp" CFLAGS="-O3 -xW" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress -limf"',
+#'./configure --enable-intel --enable-single --enable-fftw --with-fftw="/home/djchen/build/fftw/" FCFLAGS="-O3 -xW -132 -fpp" CFLAGS="-O3 -xW" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress -limf"');
 
 @CONFIGURE_OPTIONS = (['default',' '],['even','--enable-useeven'],['stride1','--enable-stride1'],['even-stride1','--enable-useeven --enable-stride1']);
 
@@ -46,3 +52,4 @@ $OUTPUT_PATH = "/mirage/djchen/logs";
 
 
 #'48 36 72 2 2','48 36 72 1 2','48 36 72 2 1','48 36 72 1 1');
+

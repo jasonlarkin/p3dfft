@@ -145,9 +145,6 @@ for ($count = 0; $count < $total_tests; $count++) {
 		@tests = glob ("*.x");
 		foreach (@tests) {
 			for ($dims_count = 0; $dims_count < @DIMS_OPTIONS; $dims_count++) {
-				print QSUB "echo ======================================================\n";
-				print QSUB "echo Starting $_ test$count-$name-$dims\n";
-				print QSUB "echo ======================================================\n";
 				$dims_np = $DIMS_OPTIONS[$dims_count][0];
 				$dims = $DIMS_OPTIONS[$dims_count][1];
 				$dims =~ s/ /_/;
@@ -156,15 +153,22 @@ for ($count = 0; $count < $total_tests; $count++) {
 					$stdin = $STDIN_OPTIONS[$stdin_count];
 					$stdin =~ s/ /_/g;
 					print QSUB "echo $STDIN_OPTIONS[$stdin_count] > stdin\n";
-					print QSUB "set a = `mpirun -np $dims_np $_ > $OUTPUT_PATH/t$count-$name-$dims-$stdin-$_.log`\n";
-					#print QSUB "if(\$a > 0) then\n"
-					#print QSUB "echo error\n";
-					#print QSUB "endif\n"
+					print QSUB "echo Running t$count-$name-$dims-$stdin-$_.log\n";
+					print QSUB "mpirun -np $dims_np $_ > $OUTPUT_PATH/t$count-$name-$dims-$stdin-$_.log\n";
+					print QSUB 'if($? > 0) then'."\n";
+					print QSUB 'echo '."t$count-$name-$dims-$stdin-$_".' ERROR'."\n";
+					print QSUB 'else'."\n";
+					print QSUB 'echo '."t$count-$name-$dims-$stdin-$_".' OK'."\n";
+					print QSUB 'endif'."\n";
 				}
 			}
 		}
 	}
 }
+
+print QSUB "echo ======================================================\n";
+print QSUB "echo Tests Completed\n";
+print QSUB "echo ======================================================\n";
 
 close(QSUB);
 
