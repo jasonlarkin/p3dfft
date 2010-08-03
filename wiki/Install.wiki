@@ -32,8 +32,9 @@ P3DFFT uses a configure script to create Makefiles for compiling the library as 
 || PGI || fftw3 || ./configure --enable-pgi --enable-fftw --with-fftw="$TACC_FFTW3_DIR" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -Mpreprocess -byteswapio" CFLAGS="-fastsse -tp barcelona-64" || 
 
 = Compiling on Kraken =
+*_Note: The latest version of the PGI compiler (10.*) breaks P3DFFT. Please use module pgi/9.04 instead_*
 || *Compiler* || *Modules* || *Arguments* ||
-|| PGI || pgi, fftw, mpi || ./configure --enable-fftw --with-fftw="$FFTW_DIR/.." --enable-useeven --enable-stride1 --enable-pgi FC=ftn FCFLAGS="-fastsse -tp istanbul-64 -Mextend -Mpreprocess -byteswapio"  CC=cc CFLAGS="-fastsse -tp istanbul-64" ||
+|| PGI || pgi/9.04, fftw, mpi || ./configure --enable-fftw --with-fftw="$FFTW_DIR/.." --enable-useeven --enable-stride1 --enable-pgi FC=ftn FCFLAGS="-fastsse -tp istanbul-64 -Mextend -Mpreprocess -byteswapio"  CC=cc CFLAGS="-fastsse -tp istanbul-64" ||
 
 = Compiling on NCSA (Abe) =
 || *Compiler* || *SoftEnv Key* || *Arguments* ||
