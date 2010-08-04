@@ -23,7 +23,7 @@ $NODES = "1";
 # processors per node
 $PROCS_NODE = "6";
 # walltime
-$WALLTIME = "0:10:00";
+$WALLTIME = "0:30:00";
 # job name
 $JOB_NAME = "p3dfft-test";
 # path where the job will run from 
