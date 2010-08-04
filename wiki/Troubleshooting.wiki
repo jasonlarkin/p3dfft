@@ -1,4 +1,2 @@
-#summary One-sentence summary of this page.
-
 *FFTW location not found!*
 Make sure you are passing a location that contains the FFTW library.
