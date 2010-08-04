@@ -1,13 +1,4 @@
 #summary One-sentence summary of this page.
 
-= Introduction =
-
-Space filler.
-
-
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+*FFTW location not found!*
+Make sure you are passing a location that contains the FFTW library.
