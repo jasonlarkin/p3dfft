@@ -4,3 +4,4 @@ Questions or comments? Join the P3DFFT mailing list and get the answers you need
   * [UserGuide User Guide]
   * [Papers Papers and Presentations]
   * [ExternalResources External Links]
+  * [Troubleshooting Troubleshooting]
