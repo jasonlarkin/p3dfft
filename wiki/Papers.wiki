@@ -1,3 +1,4 @@
 #summary Papers and Presentations for P3DFFT
 
 [http://p3dfft.googlecode.com/svn/docs/SC08_poster.ppt Supercomputing'08 poster presentation]
+[http://p3dfft.googlecode.com/svn/docs/TG08_DNS.pdf Turbluence Simulations on O(10^4) processors]
