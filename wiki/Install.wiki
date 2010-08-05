@@ -10,6 +10,7 @@ The latest version of P3DFFT can be found here. Once you have extracted the pack
 P3DFFT uses a configure script to create Makefiles for compiling the library as well as several examples. This page will step you through the process of running the configure script properly.
 
 || *Flags* || *Description* ||
+|| --prefix=PREFIX || This option will install p3dfft to PREFIX when you run make install.  || 
 || --enable-single || compiles P3DFFT in single-precision ||
 || --enable-fftw || enables the use of the FFTW library ||
 || --with-fftw=<path to FFTW3 library> || path to FFTW library ||
