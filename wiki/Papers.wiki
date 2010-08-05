@@ -2,3 +2,4 @@
 
  * [http://p3dfft.googlecode.com/svn/docs/SC08_poster.ppt Supercomputing'08 poster presentation]
  * [http://p3dfft.googlecode.com/svn/docs/TG08_DNS.pdf Turbluence Simulations on O(10^4) processors]
+ * [http://p3dfft.googlecode.com/svn/docs/SDSC_p3dfft.pdf SDSC article on P3DFFT]
