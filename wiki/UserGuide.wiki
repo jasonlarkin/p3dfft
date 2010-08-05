@@ -1,3 +1,4 @@
+=P3DFFT User Guide=
 #summary Version 2.4
 
 Copyright (C) 2006-2010 Dmitry Pekurovsky
@@ -12,21 +13,21 @@ You should have received a copy of the GNU General Public License along with thi
 </td></tr></table>
 
 *Click [http://code.google.com/p/p3dfft/downloads/list here] to download the PDF version of the User Guide*
-===Acknowledgements===
+==Acknowledgements==
 
   * Prof. P.K.Yeung
   * Dr. Diego Donzis
   * Dr. Giri Chukkapalli
   * Dr. Geert Brethouwer
 
-===Using the P3DFFT Library===
+==Using the P3DFFT Library==
 
-==1. p3dfft module==
+===1. p3dfft module===
 The p3dfft module declares important variables. It should be included in any code that calls P3DFFT routines (via use p3dfft statement in Fortran).
 
 The p3dfft module also specifies mytype, which is the type of real and complex numbers. Its value of 4 corresponds to single precision and 8 for double precision. You can choose precision at compile time through a preprocessor flag (see Installation Guide).
 
-==2. Initialization==
+===2. Initialization===
 Before using the library it is necessary to call an initialization routine 'p3dfft_setup'.
 
 *Usage:* _p3dfft_setup(proc_dims,nx,ny,nz,overwrite)_
@@ -38,7 +39,7 @@ Before using the library it is necessary to call an initialization routine 'p3df
 || _nx, ny, nz_ || Input || (Integer) Dimensions of the 3D transform (also the global grid dimensions) || 
 || _overwrite_ || Input || (Logical) When set to .true. (or 1 in C) this argument indicates that it is safe to overwrite the input of the btran (backward transform) routine. This may speed up performance of FFTW routines in some cases when non-stride-1 transforms are made. || 
 
-==3. Array Decomposition==
+===3. Array Decomposition===
 
 The p3dfft_setup routine sets up the two-dimensional (2D) array decomposition. P3DFFT employs 2D block decomposition whereby processors are arranged into a 2D grid P1 x P2, based on their MPI rank. Two of the dimensions of the 3D grid are block-distributed across the processor grid, by assigning the blocks to tasks in the rank order. The third dimension of the grid remains undivided, i.e. contained entirely within local memory (see Fig. 1). This scheme is sometimes called pencils decomposition.
 
@@ -66,7 +67,7 @@ P3DFFT uses 2D block decomposition to assign local arrays for each task. In many
 It should be clear that the user’s choice of P1 and P2 can make a difference on how balanced is the decomposition. Obviously the greater load imbalance, the less performance can be expected.
 
 Note: the two array types are distributed among processors in a different way from each other, but this does not automatically imply anything about the ordering of the elements in memory. Memory layout of the original (ip=1) array uses the “Fortran” ordering. For example, for an array A(lx,ly,lz) the index corresponding to lx runs fastest. Memory layout for the transposed (ip=2) array type depends on how the P3DFFT library was built. By default, it preserves the ordering of the real array, i.e. (X,Y,Z). However, in many cases it is advisable to have Z dimension contiguous, i.e. a memory layout (Z,X,Y). This can speed up some computations in the wavenumber space by improving cache utilization through spatial locality in Z, and also often results in better performance of P3DFFT transforms themselves. The (Z,X,Y) layout can be triggered by building the library with –DSTRIDE1 preprocessor flag in the makefile. For more information, see performance section below.
-==4. Forward (real-to-complex) and backward (complex-to-real) 3D Fourier transforms==
+===4. Forward (real-to-complex) and backward (complex-to-real) 3D Fourier transforms===
 
 Forward transform is implemented by the p3dfft_ftran_r2c subroutine using the following format:
 
@@ -80,17 +81,17 @@ Backward transform is implemented by the p3dfft_btran_c2r subroutine using the f
 
 The input IN is an array of complex numbers with dimensions defined by array type with ip=2 (see Table 2 above), i.e. Z dimension is contained entirely, and X and Y dimensions are distributed among P1 and P2 tasks correspondingly. The output OUT is an array of real numbers with dimensions defined by array type with ip=1, i.e. X dimension is contained entirely within each task, and Y and Z are dimensions distributed among P1 and P2 tasks respectively.
 
-== 5. Complex array storage definition ==
+=== 5. Complex array storage definition ===
 
 Since Fourier transform of a real function has the property of conjugate symmetry, only about half of the complex Fourier coefficients need to be kept. To be precise, if the input array has n real elements, Fourier coefficients F(k) for k=n/2+1,..,n can be dropped as they can be easily restored from the rest of the coefficients. This saves both memory and time. In this version we do not attempt to further pack the complex data. Therefore the output array for the forward transform (and the input array of the backward transform) contains (Nx/2+1) * Ny * Ny complex numbers, with the understanding that Nx/2-1 elements in X direction are missing and can be restored from the remaining elements. As mentioned above, the Nx/2+1 elements in the X direction are distributed among P1 tasks in the transposed layout.
 
-== 6. In-place transforms ==
+=== 6. In-place transforms ===
 
 In and Out arrays can occupy the same space in memory (in-place transform). In this case, it is necessary to make sure that they start in the same location, otherwise the results are unpredictable. Also it is important to remember that the sizes of input and output arrays in general are not equal. The complex array is usually bigger since it contains the Nyquist frequency mode in X direction, in addition to the Nx/2 modes that equal in space to Nx real numbers. However when decomposition is not even, sometimes the real array can be bigger than the complex one, depending on the task ID. Therefore to be safe one must make sure the common-space array is large enough for both input and output. This can be done by finding out dimensions of both original and transposed arrays y calling get_dims two times with ip=1 and 2.
 
 In Fortran using in-place transforms is a bit tricky due to language restrictions on subroutine argument types (i.e., one of the arrays is expected to be real and the other complex). In order to overcome this problem wrapper routines are provided, named ftran_r2c and btran_c2r respectively for forward and backward transform (without p3dfft_ prefix). There are examples for such in-place transform in the sample/ subdirectory. These wrappers can be also used for out-of-place transforms just as well.
 
-== 7. Memory requirements ==
+=== 7. Memory requirements ===
 
 Besides the input and output arrays (which can occupy the same space, as mentioned above) P3DFFT allocates temporary buffers roughly 3 times the size of the input or output array.
 8. Performance considerations
