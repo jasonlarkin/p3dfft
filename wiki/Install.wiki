@@ -39,7 +39,7 @@ as needed. If you wish to share more examples or to request or contribute in sup
 || PGI || fftw3 || ./configure --enable-pgi --enable-fftw --with-fftw="$TACC_FFTW3_DIR" FCFLAGS="-fastsse -tp barcelona-64 -Mpreprocess" CFLAGS="-fastsse -tp barcelona-64" || 
 
 = Compiling on Kraken at NICS =
-*_Note: The latest version of the PGI compiler (10.xx) breaks P3DFFT. Please use module pgi/9.04 instead_*
+*_Note: The latest version of the PGI compiler (10.xx) sometimes breaks P3DFFT. Please use module pgi/9.04 instead_*
 || *Compiler* || *Modules* || *Arguments* ||
 || PGI || pgi/9.04, fftw, mpi || ./configure --enable-fftw --with-fftw="$FFTW_DIR/.." --enable-useeven --enable-stride1 --enable-pgi FC=ftn FCFLAGS="-fastsse -tp istanbul-64  -Mpreprocess"  CC=cc CFLAGS="-fastsse -tp istanbul-64" ||
 
