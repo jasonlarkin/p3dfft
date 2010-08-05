@@ -1,5 +1,6 @@
 =P3DFFT User Guide=
-#summary Version 2.4
+
+Version 2.4
 
 Copyright (C) 2006-2010 Dmitry Pekurovsky
 San Diego Supercomputer Center/UC San Diego
