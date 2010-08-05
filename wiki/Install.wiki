@@ -20,7 +20,7 @@ P3DFFT uses a configure script to create Makefiles for compiling the library as 
 = Compiling on Triton =
 || *Compiler* || *Modules* || *Arguments* ||
 || PGI || pgi, fftw, mpi || ./configure --enable-pgi --enable-fftw --with-fftw="$FFTWHOME" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -Mpreprocess -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress" ||
-|| Intel || intel, fftw, mpi || ./configure --enable-intel --enable-fftw --enable-stride1 --with-fftw="$FFTWHOME" FCFLAGS="-O3 -xW -132 -fpp" CFLAGS="-O3 -xW" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress -limf" ||
+|| Intel || intel, fftw, mpi || ./configure --enable-intel --enable-fftw --with-fftw="$FFTWHOME" FCFLAGS="-O3 -xW -132 -fpp" CFLAGS="-O3 -xW" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress -limf" ||
 || GCC || gnu, fftw, mpi || ./configure --enable-gcc --enable-fftw --with-fftw="$FFTWHOME" LDFLAGS="-lmpi_f90 -lmpi_f77" || 
 
 = Compiling on IBM =
@@ -34,8 +34,8 @@ P3DFFT uses a configure script to create Makefiles for compiling the library as 
 = Compiling on Kraken =
 *_Note: The latest version of the PGI compiler (10.xx) breaks P3DFFT. Please use module pgi/9.04 instead_*
 || *Compiler* || *Modules* || *Arguments* ||
-|| PGI || pgi/9.04, fftw, mpi || ./configure --enable-fftw --with-fftw="$FFTW_DIR/.." --enable-useeven --enable-stride1 --enable-pgi FC=ftn FCFLAGS="-fastsse -tp istanbul-64 -Mextend -Mpreprocess -byteswapio"  CC=cc CFLAGS="-fastsse -tp istanbul-64" ||
+|| PGI || pgi/9.04, fftw, mpi || ./configure --enable-fftw --with-fftw="$FFTW_DIR/.." --enable-pgi FC=ftn FCFLAGS="-fastsse -tp istanbul-64 -Mextend -Mpreprocess -byteswapio"  CC=cc CFLAGS="-fastsse -tp istanbul-64" ||
 
 = Compiling on NCSA (Abe) =
 || *Compiler* || *SoftEnv Key* || *Arguments* ||
-|| Intel || +fftw-3.1-intel, +openmpi-1.3.2-intel || ./configure --enable-intel --enable-fftw --enable-dstride1 --with-fftw="$FFTW_HOME" FCFLAGS="-O3 -xW -132 -fpp -vec_report0" CFLAGS="-O3 -xW -vec_report0" LDFLAGS="-lmpi_f90 -lmpi_f77 -limf" ||
+|| Intel || +fftw-3.1-intel, +openmpi-1.3.2-intel || ./configure --enable-intel --enable-fftw --with-fftw="$FFTW_HOME" FCFLAGS="-O3 -xW -132 -fpp -vec_report0" CFLAGS="-O3 -xW -vec_report0" LDFLAGS="-lmpi_f90 -lmpi_f77 -limf" ||
