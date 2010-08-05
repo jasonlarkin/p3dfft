@@ -17,25 +17,31 @@ P3DFFT uses a configure script to create Makefiles for compiling the library as 
 || CFLAGS=<C compiler flags> || flags to use with C compiler ||
 || LDFLAGS=<libraries to link> || additional linker flags ||
 
+Run "configure --help" for complete list of options.
+Recommended options: --enable-stride1. For Cray XT platforms also recommended --enable-useeven.
+
+Currently the package supports four compiler suites: PGI, Intel, IBM and GNU. Some examples of compiling on several systems are given below. Users may need to customize
+as needed. If you wish to share more examples or to request or contribute in support for other compilers, please write to dmitry@sdsc.edu. If you give us an account on your system we will work with you to customize the installation. 
+
 = Compiling on Triton =
 || *Compiler* || *Modules* || *Arguments* ||
-|| PGI || pgi, fftw, mpi || ./configure --enable-pgi --enable-fftw --with-fftw="$FFTWHOME" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -Mpreprocess -byteswapio" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress" ||
-|| Intel || intel, fftw, mpi || ./configure --enable-intel --enable-fftw --with-fftw="$FFTWHOME" FCFLAGS="-O3 -xW -132 -fpp" CFLAGS="-O3 -xW" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress -limf" ||
+|| PGI || pgi, fftw, mpi || ./configure --enable-pgi --enable-fftw --with-fftw="$FFTWHOME" FCFLAGS="-fastsse -tp barcelona-64 -Mpreprocess" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress" ||
+|| Intel || intel, fftw, mpi || ./configure --enable-intel --enable-fftw --enable-stride1 --with-fftw="$FFTWHOME" FCFLAGS="-O3 -xW -132 -fpp" CFLAGS="-O3 -xW" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress -limf" ||
 || GCC || gnu, fftw, mpi || ./configure --enable-gcc --enable-fftw --with-fftw="$FFTWHOME" LDFLAGS="-lmpi_f90 -lmpi_f77" || 
 
-= Compiling on IBM =
+= Compiling on IBM Power7=
 || *Compiler* || *Modules* || *Arguments* ||
-|| mpfort || essl || ./configure FC=mpfort FCFLAGS="-qcclines -qarch=pwr7 -qstrict -qnosave -qtune=pwr7 -qhot -qsimd=auto -qcache=auto -qsmp=omp -qthreaded -qfixed=132 -O3 -q64 -qfloat=hsflt:fltint" CC=mpcc CFLAGS="-q64 -DNUS_XCOMP" CPP=/usr/bin/cpp --enable-essl --enable-stride1 --enable-ibm --host="bd-login" ||
+|| mpfort || essl || ./configure FC=mpfort FCFLAGS="-qcclines -qarch=pwr7 -qstrict -qnosave -qtune=pwr7 -qhot -qsimd=auto -qcache=auto -qsmp=omp -qthreaded -O3 -q64 -qfloat=hsflt:fltint" CC=mpcc CFLAGS="-q64 -DNUS_XCOMP" CPP=/usr/bin/cpp --enable-essl --enable-stride1 --enable-ibm --host="bd-login" ||
 
-= Compiling on TACC =
+= Compiling on Ranger at TACC =
 || *Compiler* || *Modules* || *Arguments* ||
-|| PGI || fftw3 || ./configure --enable-pgi --enable-fftw --with-fftw="$TACC_FFTW3_DIR" FCFLAGS="-fastsse -tp barcelona-64 -Mextend -Mpreprocess -byteswapio" CFLAGS="-fastsse -tp barcelona-64" || 
+|| PGI || fftw3 || ./configure --enable-pgi --enable-fftw --with-fftw="$TACC_FFTW3_DIR" FCFLAGS="-fastsse -tp barcelona-64 -Mpreprocess" CFLAGS="-fastsse -tp barcelona-64" || 
 
-= Compiling on Kraken =
+= Compiling on Kraken at NICS =
 *_Note: The latest version of the PGI compiler (10.xx) breaks P3DFFT. Please use module pgi/9.04 instead_*
 || *Compiler* || *Modules* || *Arguments* ||
-|| PGI || pgi/9.04, fftw, mpi || ./configure --enable-fftw --with-fftw="$FFTW_DIR/.." --enable-pgi FC=ftn FCFLAGS="-fastsse -tp istanbul-64 -Mextend -Mpreprocess -byteswapio"  CC=cc CFLAGS="-fastsse -tp istanbul-64" ||
+|| PGI || pgi/9.04, fftw, mpi || ./configure --enable-fftw --with-fftw="$FFTW_DIR/.." --enable-useeven --enable-stride1 --enable-pgi FC=ftn FCFLAGS="-fastsse -tp istanbul-64  -Mpreprocess"  CC=cc CFLAGS="-fastsse -tp istanbul-64" ||
 
 = Compiling on NCSA (Abe) =
 || *Compiler* || *SoftEnv Key* || *Arguments* ||
-|| Intel || +fftw-3.1-intel, +openmpi-1.3.2-intel || ./configure --enable-intel --enable-fftw --with-fftw="$FFTW_HOME" FCFLAGS="-O3 -xW -132 -fpp -vec_report0" CFLAGS="-O3 -xW -vec_report0" LDFLAGS="-lmpi_f90 -lmpi_f77 -limf" ||
+|| Intel || +fftw-3.1-intel, +openmpi-1.3.2-intel || ./configure --enable-intel --enable-fftw --enable-dstride1 --with-fftw="$FFTW_HOME" FCFLAGS="-O3 -xW -132 -fpp -vec_report0" CFLAGS="-O3 -xW -vec_report0" LDFLAGS="-lmpi_f90 -lmpi_f77 -limf" ||
