@@ -40,11 +40,23 @@ Table 2: Filename and description of samples
 || Source filename || Binary filename || Description ||
 || driver_inverse.c, driver_inverse.F90 || test_inverse_c.x, test_inverse_f.x || This program initializes a 3D array of complex numbers with a 3D sine/cosine wave, then performs inverse FFT transform, and checks that the results are correct. This sample program also demonstrates how to work with complex arrays in wavenumber space, declared as real. || 
 || driver_rand.c, driver_rand.F90 || test_rand_c.x, test_rand_f.x || This program initializes a 3D array with random numbers, then performs forward 3D Fourier transform, then backward transform, and checks that the results are correct, namely the same as in the start except for a normalization factor. It can be used both as a correctness test and for timing the library functions. || 
+|| driver_sine.c, driver_sine_inplace.c, driver_sine.F90, driver_sine_ineplace.F90 || test_sine_c.x, test_sine_inplace_c.x, test_sine_f.x, test_sine_inplace_f.x || This program initializes a 3D array with a 3D sine wave, then performs 3D forward Fourier transform, then backward transform, and checks that the results are correct, namely the same as in the start except for a normalization factor. It can be used both as a correctness test and for timing the library functions. ||
+|| driver_spec.c, driver_spec.F90 || test_spec_c.x, test_spec_f.x || This program initializes a 3D array with a 3D sine wave, then performs 3D FFT forward transform, and computes power spectrum. ||
 
-===1. p3dfft module===
+=== 2. Installing p3dfft ===
+In order to prepare the p3dfft for compiling and installation, you must run the included configure script. Here is a simple example on how to run the configure script:
+
+_$ ./configure --enable-pgi --enable-fftw --with-fftw=/usr/local/fftw/ LDFLAGS=”-lmpi_f90 –lmpi_f77”_
+
+The above will prepare p3dfft to be compiled by the PGI compiler with FFTW support. There are more arguments included in the configure script that will allow you to customize p3dfft to your requirements:
+
+
+=== 1. p3dfft module===
 The p3dfft module declares important variables. It should be included in any code that calls P3DFFT routines (via use p3dfft statement in Fortran).
 
-The p3dfft module also specifies mytype, which is the type of real and complex numbers. Its value of 4 corresponds to single precision and 8 for double precision. You can choose precision at compile time through a preprocessor flag (see Installation Guide).
+The p3dfft module also specifies mytype, which is the type of real and complex numbers. You can choose precision at compile time through a preprocessor flag (see Installation Guide).
+
+===
 
 ===2. Initialization===
 Before using the library it is necessary to call an initialization routine 'p3dfft_setup'.
