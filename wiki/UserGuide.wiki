@@ -32,7 +32,18 @@ The following is a directory listing for what you should find int he p3dfft pack
 || include/ || The library is provided as a Fortran module. After installation this directory will have p3dfft.mod (for Fortran interface), p3dfft.h (C wrapper/include file), and config.h (header that contains all arguments used when configure script was executed). *^* ||
 || sample/ || This directory has example programs in both FORTRAN and C, in separate subdirectories. Tests provided include out-of-place and in-place transforms 3D FFT, with error checking. Also provided is an example of power spectrum calculation. Example programs will be compiled automatically with the library during make. ||
 
-*^IMPORTRANT:* 
+*^IMPORTRANT:* _In order to use p3dfft with C programs, you must include the p3dfft.h header file in your program. This header file defines an interface that allows C programs to call Fortran functions from the p3dfft library._
+
+In addition to the library itself, the package includes several sample programs to illustrate how to use p3dfft. These sample programs can be found in the sample/ directory:
+
+Table 2: Filename and description of samples
+|| Source filename || Binary filename || Description ||
+|| driver_inverse.c
+   driver_inverse.F90 
+|| test_inverse_c.x
+   test_inverse_f.x
+|| This program initializes a 3D array of complex numbers with a 3D sine/cosine wave, then performs inverse FFT transform, and checks that the results are correct. This sample program also demonstrates how to work with complex arrays in wavenumber space, declared as real.
+|| 
 
 
 ===1. p3dfft module===
