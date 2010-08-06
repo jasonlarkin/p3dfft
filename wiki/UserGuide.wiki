@@ -38,13 +38,8 @@ In addition to the library itself, the package includes several sample programs 
 
 Table 2: Filename and description of samples
 || Source filename || Binary filename || Description ||
-|| driver_inverse.c
-   driver_inverse.F90 
-|| test_inverse_c.x
-   test_inverse_f.x
-|| This program initializes a 3D array of complex numbers with a 3D sine/cosine wave, then performs inverse FFT transform, and checks that the results are correct. This sample program also demonstrates how to work with complex arrays in wavenumber space, declared as real.
-|| 
-
+|| driver_inverse.c, driver_inverse.F90 || test_inverse_c.x, test_inverse_f.x || This program initializes a 3D array of complex numbers with a 3D sine/cosine wave, then performs inverse FFT transform, and checks that the results are correct. This sample program also demonstrates how to work with complex arrays in wavenumber space, declared as real. || 
+|| driver_rand.c, driver_rand.F90 || test_rand_c.x, test_rand_f.x || This program initializes a 3D array with random numbers, then performs forward 3D Fourier transform, then backward transform, and checks that the results are correct, namely the same as in the start except for a normalization factor. It can be used both as a correctness test and for timing the library functions. || 
 
 ===1. p3dfft module===
 The p3dfft module declares important variables. It should be included in any code that calls P3DFFT routines (via use p3dfft statement in Fortran).
