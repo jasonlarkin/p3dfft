@@ -104,16 +104,16 @@ Before using the library it is necessary to call an initialization routine 'p3df
 
 The p3dfft_setup routine sets up the two-dimensional (2D) array decomposition. P3DFFT employs 2D block decomposition whereby processors are arranged into a 2D grid P1 x P2, based on their MPI rank. Two of the dimensions of the 3D grid are block-distributed across the processor grid, by assigning the blocks to tasks in the rank order. The third dimension of the grid remains undivided, i.e. contained entirely within local memory (see Fig. 1). This scheme is sometimes called pencils decomposition.
 
-A block decomposition is defined by dimensions of the local portion of the array contained within each task, as well as the beginning and ending indices for each dimension defining the array’s location within the global array. This information is returned by get_dims routine which should be called before setting up the data structures of your program (see sample/ subdirectory for example programs).
+A block decomposition is defined by dimensions of the local portion of the array contained within each task, as well as the beginning and ending indices for each dimension defining the array’s location within the global array. This information is returned by p3dfft_get_dims routine which should be called before setting up the data structures of your program (see sample/ subdirectory for example programs).
 
 *Figure 1:* An example of 2D block( a.k.a. pencils) decomposition of a 3D grid.
 <p />http://www.sdsc.edu/us/resources/p3dfft/blocks.jpg
 
 In P3DFFT, the decompositions of the output and input arrays, while both being two-dimensional, differ from each other. The reason for this is as follows. In 3D Fourier Transform it is necessary to transpose the data a few times (two times for two-dimensional decomposition) in order to rearrange the data so as to always perform one-dimensional FFT on data local in memory of each processing element. It would be possible to transpose the data back to the original form after the 3D transform is done, however it often makes sense to save significant time by forgoing this final transpose. All the user has to do is to operate on the output array while keeping in mind that the data are in a transposed form. The backward (complex-to-real) transform takes the array in a transposed form and produces a real array in the original form. The rest of this section clarifies exactly the original and transposed form of the arrays.
 
-*Usage:* _get_dims(start,end,size,ip)_
+*Usage:* p3dfft_get_dims(start,end,size,ip)_
 
-*Table 5:* Arguments of get_dims()
+*Table 5:* Arguments of p3dfft_get_dims()
 
 || *Argument* || *Intent* || *Description* ||
 || _start_ || Output || An array containing 3 integers, defining the beginning indices of the local array for the given task within the global grid. || 
@@ -148,7 +148,7 @@ Since Fourier transform of a real function has the property of conjugate symmetr
 
 === 8. In-place transforms ===
 
-In and Out arrays can occupy the same space in memory (in-place transform). In this case, it is necessary to make sure that they start in the same location, otherwise the results are unpredictable. Also it is important to remember that the sizes of input and output arrays in general are not equal. The complex array is usually bigger since it contains the Nyquist frequency mode in X direction, in addition to the Nx/2 modes that equal in space to Nx real numbers. However when decomposition is not even, sometimes the real array can be bigger than the complex one, depending on the task ID. Therefore to be safe one must make sure the common-space array is large enough for both input and output. This can be done by finding out dimensions of both original and transposed arrays y calling get_dims two times with ip=1 and 2.
+In and Out arrays can occupy the same space in memory (in-place transform). In this case, it is necessary to make sure that they start in the same location, otherwise the results are unpredictable. Also it is important to remember that the sizes of input and output arrays in general are not equal. The complex array is usually bigger since it contains the Nyquist frequency mode in X direction, in addition to the Nx/2 modes that equal in space to Nx real numbers. However when decomposition is not even, sometimes the real array can be bigger than the complex one, depending on the task ID. Therefore to be safe one must make sure the common-space array is large enough for both input and output. This can be done by finding out dimensions of both original and transposed arrays y calling p3dfft_get_dims two times with ip=1 and 2.
 
 In Fortran using in-place transforms is a bit tricky due to language restrictions on subroutine argument types (i.e., one of the arrays is expected to be real and the other complex). In order to overcome this problem wrapper routines are provided, named ftran_r2c and btran_c2r respectively for forward and backward transform (without p3dfft_ prefix). There are examples for such in-place transform in the sample/ subdirectory. These wrappers can be also used for out-of-place transforms just as well.
 
