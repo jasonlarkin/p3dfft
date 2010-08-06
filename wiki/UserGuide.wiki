@@ -50,6 +50,18 @@ _$ ./configure --enable-pgi --enable-fftw --with-fftw=/usr/local/fftw/ LDFLAGS=â
 
 The above will prepare p3dfft to be compiled by the PGI compiler with FFTW support. There are more arguments included in the configure script that will allow you to customize p3dfft to your requirements:
 
+*Table 3: * Arguments of configure script
+|| Argument || Description || Example ||
+|| --prefix=PREFIX || This argument will install p3dfft to PREFIX when you run make install. The following files will be installed:
+
+ * libp3dfft.a -> PREFIX/lib/
+ * p3dfft.h -> PREFIX/include
+ * config.h -> PREFIX/include
+ * samples -> PREFIX/share
+
+By default, configure will install to /usr/local || --prefix=$HOME/local/ || 
+
+
 
 === 1. p3dfft module===
 The p3dfft module declares important variables. It should be included in any code that calls P3DFFT routines (via use p3dfft statement in Fortran).
