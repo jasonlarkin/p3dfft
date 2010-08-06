@@ -21,7 +21,16 @@ You should have received a copy of the GNU General Public License along with thi
   * Dr. Giri Chukkapalli
   * Dr. Geert Brethouwer
 
-==Using the P3DFFT Library==
+===1. Directory Structure and Files ===
+
+The following is a directory listing for what you should find int he p3dfft package:
+
+*Table 1:* Directory structure of p3dfft package
+|| Directory || Description ||
+|| <_toplevel_> || The configure script is located here. Running the configure script is essential for properly building p3dfft. Please refer to section 2 of this guide for more information. ||
+|| build/ ||  The library files are contained here. Building the library is required before it can be used. In order to build the library, you must run ./configure from the top level directory. Then type "make" and then "make install". For further details on building the library see section 2 of this guide. ||
+|| include/ || The library is provided as a Fortran module. After installation this directory will have p3dfft.mod (for Fortran interface), p3dfft.h (C wrapper/include file), and config.h (header that contains all arguments used when configure script was executed). *** ||
+
 
 ===1. p3dfft module===
 The p3dfft module declares important variables. It should be included in any code that calls P3DFFT routines (via use p3dfft statement in Fortran).
