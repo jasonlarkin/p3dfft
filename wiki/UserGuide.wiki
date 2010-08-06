@@ -43,7 +43,7 @@ Table 2: Filename and description of samples
 || driver_sine.c, driver_sine_inplace.c, driver_sine.F90, driver_sine_ineplace.F90 || test_sine_c.x, test_sine_inplace_c.x, test_sine_f.x, test_sine_inplace_f.x || This program initializes a 3D array with a 3D sine wave, then performs 3D forward Fourier transform, then backward transform, and checks that the results are correct, namely the same as in the start except for a normalization factor. It can be used both as a correctness test and for timing the library functions. ||
 || driver_spec.c, driver_spec.F90 || test_spec_c.x, test_spec_f.x || This program initializes a 3D array with a 3D sine wave, then performs 3D FFT forward transform, and computes power spectrum. ||
 
-=== 2. Installing p3dfft ===
+===2. Installing p3dfft ===
 In order to prepare the p3dfft for compiling and installation, you must run the included configure script. Here is a simple example on how to run the configure script:
 
 _$ ./configure --enable-pgi --enable-fftw --with-fftw=/usr/local/fftw/ LDFLAGS=”-lmpi_f90 –lmpi_f77”_
@@ -53,17 +53,43 @@ The above will prepare p3dfft to be compiled by the PGI compiler with FFTW suppo
 *Table 3: * Arguments of configure script
 || Argument || Description || Example ||
 || --prefix=PREFIX || This argument will install p3dfft to PREFIX when you run make install. By default, configure will install to /usr/local || --prefix=$HOME/local/ || 
+|| --enable-gcc, --enable-ibm, --enable-intel, --enable-pgi || These arguments will prepare p3dfft to be built by a specific compiler. You must only choose one option. || --enable-pgi || 
+|| --enable-fftw, --enable-essl || These arguments will prepare p3dfft to be used with either the FFTW or ESSL library. You must only choose one option. || --enable-fftw ||
+|| --with-fftw= _FFTWLOCATION_ || This argument specifies the path location for the FFTW library; it is mandatory if you are planning to use p3dfft with the FFTW library. || --enable-fftw --with-fftw=$FFTW_HOME ||
+|| --enable-oned || This argument is for 1D decomposition. The default is 2D decomposition but can be made to 1D by setting up a grid 1xn when running the code. || --enable-oned ||
+|| --enable-estimate || For initialization thoroughness in setting up FFTW calls. This argument only goes with –enable-fftw. || --enable-estimate || 
+|| --enable-measure || For search-once-for-the-fast algorithm (takes more time on p3dfft_setup()). || --enable-measure || 
+|| --enable-patient || For search-once-for-the-fastest-algorithm (takes much more time on p3dfft_setup()). || --enable-patient ||
+|| --enable-dimsc || To assign processor rows and columns according to the C convention. The default is Fortran convention. || --enable-dimsc || 
+|| --enable-useeven || This argument is for using MPI_Alltoall instead of MPI_Alltotallv. This will pad the send buffers with zeros to make them of equal size; not needed on most architecture. || --enable-useeven ||
+|| --enable-stride1 || To enable stride-1 data structures on output (this may in some cases give some advantage in performance). You can define loop blocking factors NLBX and NBLY to experiment, otherwise they are set to default values. || --enable-stride1 ||
+|| --enable-nblx || To define loop blocking factor NBL_X || --enable-nblx=32 ||
+|| --enable-nbly || To define loop blocking factor NBL_Y || --enable-nbly=32 || 
+|| --enable-openmp || This option will set up p3dfft to use the OpenMP library (disabled by default). || --enable-openmp ||
+|| --enable-single || This argument will compile p3dfft in single-precision. By default, configure will setup p3dfft to be compiled in double-precision. || --enable-single || 
+|| FC=<Fortran compiler> || Fortran compiler || FC=mpfort ||
+|| FCFLAGS="<Fortran compiler flags>" || Fortran compiler falgs || FCFLAGS="-Mextend" ||
+|| CC=<C compiler> || C compiler || CC=mpcc ||
+|| CFLAGS="<C compiler flags>" || C compiler flags || CFLAGS="-fastsse" ||
+|| LDFLAGS="<linker flags>" || Linker flags || LDFLAGS=-lmpi_f90 -lmpi_f77" ||
 
+More information on how to customize the configure script can be found by calling:
 
+$ ./configure --help
 
-=== 1. p3dfft module===
+For a up-to-date list of configure commands for various platforms such as Kraken, Ranger, and Triton, please refer to the p3dfft wiki page [Install here].
+
+After you have successfully run the configure script, you are ready to compile and install p3dfft. Simply run:
+
+$ make
+$ make install
+
+===3. p3dfft module===
 The p3dfft module declares important variables. It should be included in any code that calls P3DFFT routines (via use p3dfft statement in Fortran).
 
 The p3dfft module also specifies mytype, which is the type of real and complex numbers. You can choose precision at compile time through a preprocessor flag (see Installation Guide).
 
-===
-
-===2. Initialization===
+===4. Initialization===
 Before using the library it is necessary to call an initialization routine 'p3dfft_setup'.
 
 *Usage:* _p3dfft_setup(proc_dims,nx,ny,nz,overwrite)_
@@ -75,7 +101,7 @@ Before using the library it is necessary to call an initialization routine 'p3df
 || _nx, ny, nz_ || Input || (Integer) Dimensions of the 3D transform (also the global grid dimensions) || 
 || _overwrite_ || Input || (Logical) When set to .true. (or 1 in C) this argument indicates that it is safe to overwrite the input of the btran (backward transform) routine. This may speed up performance of FFTW routines in some cases when non-stride-1 transforms are made. || 
 
-===3. Array Decomposition===
+===5. Array Decomposition===
 
 The p3dfft_setup routine sets up the two-dimensional (2D) array decomposition. P3DFFT employs 2D block decomposition whereby processors are arranged into a 2D grid P1 x P2, based on their MPI rank. Two of the dimensions of the 3D grid are block-distributed across the processor grid, by assigning the blocks to tasks in the rank order. The third dimension of the grid remains undivided, i.e. contained entirely within local memory (see Fig. 1). This scheme is sometimes called pencils decomposition.
 
@@ -103,7 +129,7 @@ P3DFFT uses 2D block decomposition to assign local arrays for each task. In many
 It should be clear that the user’s choice of P1 and P2 can make a difference on how balanced is the decomposition. Obviously the greater load imbalance, the less performance can be expected.
 
 Note: the two array types are distributed among processors in a different way from each other, but this does not automatically imply anything about the ordering of the elements in memory. Memory layout of the original (ip=1) array uses the “Fortran” ordering. For example, for an array A(lx,ly,lz) the index corresponding to lx runs fastest. Memory layout for the transposed (ip=2) array type depends on how the P3DFFT library was built. By default, it preserves the ordering of the real array, i.e. (X,Y,Z). However, in many cases it is advisable to have Z dimension contiguous, i.e. a memory layout (Z,X,Y). This can speed up some computations in the wavenumber space by improving cache utilization through spatial locality in Z, and also often results in better performance of P3DFFT transforms themselves. The (Z,X,Y) layout can be triggered by building the library with –DSTRIDE1 preprocessor flag in the makefile. For more information, see performance section below.
-===4. Forward (real-to-complex) and backward (complex-to-real) 3D Fourier transforms===
+===6. Forward (real-to-complex) and backward (complex-to-real) 3D Fourier transforms===
 
 Forward transform is implemented by the p3dfft_ftran_r2c subroutine using the following format:
 
