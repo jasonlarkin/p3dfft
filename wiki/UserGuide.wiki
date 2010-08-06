@@ -52,14 +52,7 @@ The above will prepare p3dfft to be compiled by the PGI compiler with FFTW suppo
 
 *Table 3: * Arguments of configure script
 || Argument || Description || Example ||
-|| --prefix=PREFIX || This argument will install p3dfft to PREFIX when you run make install. The following files will be installed:
-
- * libp3dfft.a -> PREFIX/lib/
- * p3dfft.h -> PREFIX/include
- * config.h -> PREFIX/include
- * samples -> PREFIX/share
-
-By default, configure will install to /usr/local || --prefix=$HOME/local/ || 
+|| --prefix=PREFIX || This argument will install p3dfft to PREFIX when you run make install. By default, configure will install to /usr/local || --prefix=$HOME/local/ || 
 
 
 
