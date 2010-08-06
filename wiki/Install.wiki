@@ -9,6 +9,12 @@ The latest version of P3DFFT can be found here. Once you have extracted the pack
 = How to compile P3DFFT =
 P3DFFT uses a configure script to create Makefiles for compiling the library as well as several examples. This page will step you through the process of running the configure script properly.
 
+Run "configure --help" for complete list of options.
+Recommended options: --enable-stride1. For Cray XT platforms also recommended --enable-useeven.
+
+Currently the package supports four compiler suites: PGI, Intel, IBM and GNU. Some examples of compiling on several systems are given below. Users may need to customize
+as needed. If you wish to share more examples or to request or contribute in support for other compilers, please write to dmitry@sdsc.edu. If you give us an account on your system we will work with you to customize the installation.
+
 || *Argument* || *Description* || *Example* ||
 || --prefix=PREFIX || This argument will install p3dfft to PREFIX when you run make install. By default, configure will install to /usr/local || --prefix=$HOME/local/ || 
 || --enable-gcc, --enable-ibm, --enable-intel, --enable-pgi || These arguments will prepare p3dfft to be built by a specific compiler. You must only choose one option. || --enable-pgi || 
@@ -30,12 +36,6 @@ P3DFFT uses a configure script to create Makefiles for compiling the library as 
 || CC=<C compiler> || C compiler || CC=mpcc ||
 || CFLAGS="<C compiler flags>" || C compiler flags || CFLAGS="-fastsse" ||
 || LDFLAGS="<linker flags>" || Linker flags || LDFLAGS=-lmpi_f90 -lmpi_f77" ||
-
-Run "configure --help" for complete list of options.
-Recommended options: --enable-stride1. For Cray XT platforms also recommended --enable-useeven.
-
-Currently the package supports four compiler suites: PGI, Intel, IBM and GNU. Some examples of compiling on several systems are given below. Users may need to customize
-as needed. If you wish to share more examples or to request or contribute in support for other compilers, please write to dmitry@sdsc.edu. If you give us an account on your system we will work with you to customize the installation. 
 
 = Compiling on Triton =
 || *Compiler* || *Modules* || *Arguments* ||
