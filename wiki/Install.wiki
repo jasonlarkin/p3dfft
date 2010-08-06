@@ -9,14 +9,27 @@ The latest version of P3DFFT can be found here. Once you have extracted the pack
 = How to compile P3DFFT =
 P3DFFT uses a configure script to create Makefiles for compiling the library as well as several examples. This page will step you through the process of running the configure script properly.
 
-|| *Flags* || *Description* ||
-|| --prefix=PREFIX || This option will install p3dfft to PREFIX when you run make install.  || 
-|| --enable-single || compiles P3DFFT in single-precision ||
-|| --enable-fftw || enables the use of the FFTW library ||
-|| --with-fftw=<path to FFTW3 library> || path to FFTW library ||
-|| FCFLAGS=<Fortran compiler flags> || flags to use with Fortran compiler || 
-|| CFLAGS=<C compiler flags> || flags to use with C compiler ||
-|| LDFLAGS=<libraries to link> || additional linker flags ||
+|| *Argument* || *Description* || *Example* ||
+|| --prefix=PREFIX || This argument will install p3dfft to PREFIX when you run make install. By default, configure will install to /usr/local || --prefix=$HOME/local/ || 
+|| --enable-gcc, --enable-ibm, --enable-intel, --enable-pgi || These arguments will prepare p3dfft to be built by a specific compiler. You must only choose one option. || --enable-pgi || 
+|| --enable-fftw, --enable-essl || These arguments will prepare p3dfft to be used with either the FFTW or ESSL library. You must only choose one option. || --enable-fftw ||
+|| --with-fftw= _FFTWLOCATION_ || This argument specifies the path location for the FFTW library; it is mandatory if you are planning to use p3dfft with the FFTW library. || --enable-fftw --with-fftw=$FFTW_HOME ||
+|| --enable-oned || This argument is for 1D decomposition. The default is 2D decomposition but can be made to 1D by setting up a grid 1xn when running the code. || --enable-oned ||
+|| --enable-estimate || For initialization thoroughness in setting up FFTW calls. This argument only goes with –enable-fftw. || --enable-estimate || 
+|| --enable-measure || For search-once-for-the-fast algorithm (takes more time on p3dfft_setup()). || --enable-measure || 
+|| --enable-patient || For search-once-for-the-fastest-algorithm (takes much more time on p3dfft_setup()). || --enable-patient ||
+|| --enable-dimsc || To assign processor rows and columns according to the C convention. The default is Fortran convention. || --enable-dimsc || 
+|| --enable-useeven || This argument is for using MPI_Alltoall instead of MPI_Alltotallv. This will pad the send buffers with zeros to make them of equal size; not needed on most architecture. || --enable-useeven ||
+|| --enable-stride1 || To enable stride-1 data structures on output (this may in some cases give some advantage in performance). You can define loop blocking factors NLBX and NBLY to experiment, otherwise they are set to default values. || --enable-stride1 ||
+|| --enable-nblx || To define loop blocking factor NBL_X || --enable-nblx=32 ||
+|| --enable-nbly || To define loop blocking factor NBL_Y || --enable-nbly=32 || 
+|| --enable-openmp || This option will set up p3dfft to use the OpenMP library (disabled by default). || --enable-openmp ||
+|| --enable-single || This argument will compile p3dfft in single-precision. By default, configure will setup p3dfft to be compiled in double-precision. || --enable-single || 
+|| FC=<Fortran compiler> || Fortran compiler || FC=mpfort ||
+|| FCFLAGS="<Fortran compiler flags>" || Fortran compiler falgs || FCFLAGS="-Mextend" ||
+|| CC=<C compiler> || C compiler || CC=mpcc ||
+|| CFLAGS="<C compiler flags>" || C compiler flags || CFLAGS="-fastsse" ||
+|| LDFLAGS="<linker flags>" || Linker flags || LDFLAGS=-lmpi_f90 -lmpi_f77" ||
 
 Run "configure --help" for complete list of options.
 Recommended options: --enable-stride1. For Cray XT platforms also recommended --enable-useeven.
