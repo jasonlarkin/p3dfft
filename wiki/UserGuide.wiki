@@ -51,9 +51,9 @@ _$ ./configure --enable-pgi --enable-fftw --with-fftw=/usr/local/fftw/ LDFLAGS=â
 The above will prepare p3dfft to be compiled by the PGI compiler with FFTW support. There are more arguments included in the configure script that will allow you to customize p3dfft to your requirements:
 
 *Table 3:* Arguments of configure script
-|| *Argument* || *Description* || *Example* ||
-|| --prefix=PREFIX || This argument will install p3dfft to PREFIX when you run make install. By default, configure will install to /usr/local || --prefix=$HOME/local/ || 
-|| --enable-gcc, --enable-ibm, --enable-intel, --enable-pgi || These arguments will prepare p3dfft to be built by a specific compiler. You must only choose one option. || --enable-pgi || 
+|| *Argument* || *Notes * || *Description* || *Example* ||
+|| --prefix=PREFIX || Optional || This argument will install p3dfft to PREFIX when you run make install. By default, configure will install to /usr/local || --prefix=$HOME/local/ || 
+|| --enable-gcc, --enable-ibm, --enable-intel, --enable-pgi || Optional || These arguments will prepare p3dfft to be built by a specific compiler. You must only choose one option. ||
 || --enable-fftw, --enable-essl || These arguments will prepare p3dfft to be used with either the FFTW or ESSL library. You must only choose one option. || --enable-fftw ||
 || --with-fftw= _FFTWLOCATION_ || This argument specifies the path location for the FFTW library; it is mandatory if you are planning to use p3dfft with the FFTW library. || --enable-fftw --with-fftw=$FFTW_HOME ||
 || --enable-oned || This argument is for 1D decomposition. The default is 2D decomposition but can be made to 1D by setting up a grid 1xn when running the code. || --enable-oned ||
