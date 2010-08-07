@@ -52,26 +52,25 @@ The above will prepare p3dfft to be compiled by the PGI compiler with FFTW suppo
 
 *Table 3:* Arguments of configure script
 || *Argument* || *Notes * || *Description* || *Example* ||
-|| --prefix=PREFIX || Optional || This argument will install p3dfft to PREFIX when you run make install. By default, configure will install to /usr/local || --prefix=$HOME/local/ || 
-|| --enable-gcc, --enable-ibm, --enable-intel, --enable-pgi || Optional || These arguments will prepare p3dfft to be built by a specific compiler. You must only choose one option. || --enable-pgi ||
-|| --enable-fftw, --enable-essl || Optional || These arguments will prepare p3dfft to be used with either the FFTW or ESSL library. You must only choose one option. || --enable-fftw ||
-|| --with-fftw= _FFTWLOCATION_ || Optional || This argument specifies the path location for the FFTW library; it is mandatory if you are planning to use p3dfft with the FFTW library. || --enable-fftw --with-fftw=$FFTW_HOME ||
-|| --enable-oned || Optional || This argument is for 1D decomposition. The default is 2D decomposition but can be made to 1D by setting up a grid 1xn when running the code. || --enable-oned ||
-|| --enable-estimate || Optional || For initialization thoroughness in setting up FFTW calls. This argument only goes with –enable-fftw. || --enable-estimate || 
-|| --enable-measure || Optional || For search-once-for-the-fast algorithm (takes more time on p3dfft_setup()). || --enable-measure || 
-|| --enable-patient || Optional || For search-once-for-the-fastest-algorithm (takes much more time on p3dfft_setup()). || --enable-patient ||
-|| --enable-dimsc || Optional || To assign processor rows and columns according to the C convention. The default is Fortran convention. || --enable-dimsc || 
-|| --enable-useeven || Optional || This argument is for using MPI_Alltoall instead of MPI_Alltotallv. This will pad the send buffers with zeros to make them of equal size; not needed on most architecture. || --enable-useeven ||
-|| --enable-stride1 || Optional || To enable stride-1 data structures on output (this may in some cases give some advantage in performance). You can define loop blocking factors NLBX and NBLY to experiment, otherwise they are set to default values. || --enable-stride1 ||
-|| --enable-nblx || Optional || To define loop blocking factor NBL_X || --enable-nblx=32 ||
-|| --enable-nbly || Optional || To define loop blocking factor NBL_Y || --enable-nbly=32 || 
-|| --enable-openmp || Optional || This option will set up p3dfft to use the OpenMP library (disabled by default). || --enable-openmp ||
+|| --prefix=PREFIX || Mandatory for users without access to /usr/local || This argument will install p3dfft to PREFIX when you run make install. By default, configure will install to /usr/local || --prefix=$HOME/local/ || 
+|| --enable-gcc, --enable-ibm, --enable-intel, --enable-pgi || Mandatory || These arguments will prepare p3dfft to be built by a specific compiler. You must only choose one option. || --enable-pgi ||
+|| --enable-fftw, --enable-essl || Mandatory || These arguments will prepare p3dfft to be used with either the FFTW or ESSL library. You must only choose one option. || --enable-fftw ||
+|| --with-fftw= _FFTWLOCATION_ || Mandatory if --enable-fftw is used || This argument specifies the path location for the FFTW library; it is mandatory if you are planning to use p3dfft with the FFTW library. || --enable-fftw --with-fftw=$FFTW_HOME ||
+|| --enable-oned || Optional, || This argument is for 1D decomposition. The default is 2D decomposition but can be made to 1D by setting up a grid 1xn when running the code. || --enable-oned ||
+|| --enable-estimate || Optional, use only with --enable-fftw || If this argument is passed, the FFTW library will not use run-time tuning to select the fastest algorithm for computing FFTs. || --enable-estimate || 
+|| --enable-measure || Optional, enabled by default, use only with --enable-fftw || For search-once-for-the-fast algorithm (takes more time on p3dfft_setup()). || --enable-measure || 
+|| --enable-patient || Optional, use only with --enable-fftw || For search-once-for-the-fastest-algorithm (takes much more time on p3dfft_setup()). || --enable-patient ||
+|| --enable-dimsc || Optional || To assign processor rows and columns in the Cartesian processor grid according to C convention. The default is Fortran convention which is recommended. This option does not affect the order of storage of arrays in memory. || --enable-dimsc || 
+|| --enable-useeven || Optional, recommended for Cray XT || This argument is for using MPI_Alltoall instead of MPI_Alltotallv. This will pad the send buffers with zeros to make them of equal size; not needed on most architecture but may lead to better results on Cray XT. || --enable-useeven ||
+|| --enable-stride1 || Optional, recommended || To enable stride-1 data structures on output (this may in some cases give some advantage in performance). You can define loop blocking factors NLBX and NBLY to experiment, otherwise they are set to default values. || --enable-stride1 ||
+|| --enable-nblx || Optional, recommended || To define loop blocking factor NBL_X || --enable-nblx=32 ||
+|| --enable-nbly || Optional, recommended || To define loop blocking factor NBL_Y || --enable-nbly=32 || 
 || --enable-single || Optional || This argument will compile p3dfft in single-precision. By default, configure will setup p3dfft to be compiled in double-precision. || --enable-single || 
 || FC=<Fortran compiler> || Optional || Fortran compiler || FC=mpfort ||
-|| FCFLAGS="<Fortran compiler flags>" || Optional || Fortran compiler falgs || FCFLAGS="-Mextend" ||
+|| FCFLAGS="<Fortran compiler flags>" || Optional, recommended || Fortran compiler falgs || FCFLAGS="-Mextend" ||
 || CC=<C compiler> || Optional || C compiler || CC=mpcc ||
-|| CFLAGS="<C compiler flags>" || Optional || C compiler flags || CFLAGS="-fastsse" ||
-|| LDFLAGS="<linker flags>" || Optional || Linker flags || LDFLAGS=-lmpi_f90 -lmpi_f77" ||
+|| CFLAGS="<C compiler flags>" || Optional, recommended || C compiler flags || CFLAGS="-fastsse" ||
+|| LDFLAGS="<linker flags>" || Mandatory (depending on platform) || Linker flags || LDFLAGS=-lmpi_f90 -lmpi_f77" ||
 
 More information on how to customize the configure script can be found by calling:
 
@@ -162,7 +161,7 @@ P3DFFT was created to compute 3D FFT in parallel with high efficiency. In partic
 
 Optimal performance on many parallel platforms for a given number of cores and problem size will likely depend on the choice of processor decomposition. For example, given a processor grid P1 x P2 (specified in the first argument to p3dfft_setup) performance will generally be better with smaller P1 (with the product P1 x P2 kept constant). Ideally P1 will be equal or less than the number of cores on an SMP node or a multi-core chip. In addition, the closer a decomposition is to being even, the better load balancing. 
 
-Performance is likely to be better when P3DFFT is built using –-enable-stride1 during configure. This implies stride-1 data ordering for FFTs. Note that using this argument changes the memory layout of the transposed array (see section 3 for explanation). To help tune performance further, two more arguments can be used: -enable-dnblx=… and –-enable-dnbly=…, which define block sizes in X and Y when doing local array reordering. Choosing suitable block sizes allows the program to optimize cache performance. Recommended value for NBL_Y is 1, while a reasonable value for NBL_X depends on problem size and the cache sizes of the hardware architecture.  
+Performance is likely to be better when P3DFFT is built using –-enable-stride1 during configure. This implies stride-1 data ordering for FFTs. Note that using this argument changes the memory layout of the transposed array (see section 3 for explanation). To help tune performance further, two more arguments can be used: -enable-dnblx=… and –-enable-dnbly=…, which define block sizes in X and Y when doing local array reordering. Choosing suitable block sizes allows the program to optimize cache performance. 
    
 Finally, performance will be better if overwrite parameter is set to .true. (or 1 in C) when initializing P3DFFT. This allows the library to overwrite the input array, which results in significantly faster execution when not using the –enable-stride1 argument.  
 
