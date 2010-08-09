@@ -63,8 +63,8 @@ The above will prepare p3dfft to be compiled by the PGI compiler with FFTW suppo
 || --enable-dimsc || Optional || To assign processor rows and columns in the Cartesian processor grid according to C convention. The default is Fortran convention which is recommended. This option does not affect the order of storage of arrays in memory. || --enable-dimsc || 
 || --enable-useeven || Optional, recommended for Cray XT || This argument is for using MPI_Alltoall instead of MPI_Alltotallv. This will pad the send buffers with zeros to make them of equal size; not needed on most architecture but may lead to better results on Cray XT. || --enable-useeven ||
 || --enable-stride1 || Optional, recommended || To enable stride-1 data structures on output (this may in some cases give some advantage in performance). You can define loop blocking factors NLBX and NBLY to experiment, otherwise they are set to default values. || --enable-stride1 ||
-|| --enable-nblx || Optional, recommended || To define loop blocking factor NBL_X || --enable-nblx=32 ||
-|| --enable-nbly || Optional, recommended || To define loop blocking factor NBL_Y || --enable-nbly=32 || 
+|| --enable-nblx || Optional || To define loop blocking factor NBL_X || --enable-nblx=32 ||
+|| --enable-nbly || Optional || To define loop blocking factor NBL_Y || --enable-nbly=32 || 
 || --enable-single || Optional || This argument will compile p3dfft in single-precision. By default, configure will setup p3dfft to be compiled in double-precision. || --enable-single || 
 || FC=<Fortran compiler> || Optional || Fortran compiler || FC=mpfort ||
 || FCFLAGS="<Fortran compiler flags>" || Optional, recommended || Fortran compiler falgs || FCFLAGS="-Mextend" ||
