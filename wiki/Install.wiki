@@ -44,7 +44,7 @@ as needed. If you wish to share more examples or to request or contribute in sup
 
 = Compiling on IBM Power7=
 || *Compiler* || *Modules* || *Arguments* ||
-|| mpfort || essl || ./configure FC=mpfort FCFLAGS="-qcclines -qarch=pwr7 -qstrict -qnosave -qtune=pwr7 -qhot -qsimd=auto -qcache=auto -qsmp=omp -qthreaded -O3 -q64 -qfloat=hsflt:fltint" CC=mpcc CFLAGS="-q64 -DNUS_XCOMP" CPP=/usr/bin/cpp --enable-essl --enable-stride1 --enable-ibm --host="bd-login" ||
+|| mpfort || essl || ./configure FC=mpfort FCFLAGS="-qcclines -qarch=pwr7 -qstrict -qnosave -qtune=pwr7 -qhot -qsimd=auto -qcache=auto -qsmp=omp -qthreaded -O3 -q64 -qfloat=hsflt:fltint" CC=mpcc CFLAGS="-q64 -DNUS_XCOMP" CPP=/usr/bin/cpp --enable-essl --enable-ibm --host="bd-login" ||
 
 = Compiling on Ranger at TACC =
 || *Compiler* || *Modules* || *Arguments* ||
