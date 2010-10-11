@@ -17,7 +17,7 @@ as needed. If you wish to share more examples or to request or contribute in sup
 
 || *Argument* || *Notes * || *Description* || *Example* ||
 || --prefix=PREFIX || Mandatory for users without access to /usr/local || This argument will install p3dfft to PREFIX when you run make install. By default, configure will install to /usr/local || --prefix=$HOME/local/ || 
-|| --enable-gcc, --enable-ibm, --enable-intel, --enable-pgi || Mandatory || These arguments will prepare p3dfft to be built by a specific compiler. You must only choose one option. || --enable-pgi ||
+|| --enable-gnu, --enable-ibm, --enable-intel, --enable-pgi || Mandatory || These arguments will prepare p3dfft to be built by a specific compiler. You must only choose one option. || --enable-pgi ||
 || --enable-fftw, --enable-essl || Mandatory || These arguments will prepare p3dfft to be used with either the FFTW or ESSL library. You must only choose one option. || --enable-fftw ||
 || --with-fftw= _FFTWLOCATION_ || Mandatory if --enable-fftw is used || This argument specifies the path location for the FFTW library; it is mandatory if you are planning to use p3dfft with the FFTW library. || --enable-fftw --with-fftw=$FFTW_HOME ||
 || --enable-oned || Optional, || This argument is for 1D decomposition. The default is 2D decomposition but can be made to 1D by setting up a grid 1xn when running the code. || --enable-oned ||
@@ -42,7 +42,7 @@ as needed. If you wish to share more examples or to request or contribute in sup
 || *Compiler* || *Modules* || *Arguments* ||
 || PGI || pgi, fftw, mpi || ./configure --enable-pgi --enable-fftw --with-fftw="$FFTWHOME" FCFLAGS="-fastsse -tp barcelona-64 -Mpreprocess" CFLAGS="-fastsse -tp barcelona-64" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress" ||
 || Intel || intel, fftw, mpi || ./configure --enable-intel --enable-fftw --with-fftw="$FFTWHOME" FCFLAGS="-O3 -xW -132 -fpp" CFLAGS="-O3 -xW" LDFLAGS="-lmpi_f90 -lmpi_f77 -lmyriexpress -limf" ||
-|| GCC || gnu, fftw, mpi || ./configure --enable-gcc --enable-fftw --with-fftw="$FFTWHOME" LDFLAGS="-lmpi_f90 -lmpi_f77" || 
+|| GNU || gnu, fftw, mpi || ./configure --enable-gnu --enable-fftw --with-fftw="$FFTWHOME" LDFLAGS="-lmpi_f90 -lmpi_f77" || 
 
 = Compiling on IBM Power7=
 || *Compiler* || *Modules* || *Arguments* ||
