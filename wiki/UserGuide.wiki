@@ -129,6 +129,12 @@ P3DFFT uses 2D block decomposition to assign local arrays for each task. In many
 It should be clear that the user’s choice of P1 and P2 can make a difference on how balanced is the decomposition. Obviously the greater load imbalance, the less performance can be expected.
 
 Note: the two array types are distributed among processors in a different way from each other, but this does not automatically imply anything about the ordering of the elements in memory. Memory layout of the original (ip=1) array uses the “Fortran” ordering. For example, for an array A(lx,ly,lz) the index corresponding to lx runs fastest. Memory layout for the transposed (ip=2) array type depends on how the P3DFFT library was built. By default, it preserves the ordering of the real array, i.e. (X,Y,Z). However, in many cases it is advisable to have Z dimension contiguous, i.e. a memory layout (Z,Y,X). This can speed up some computations in the wavenumber space by improving cache utilization through spatial locality in Z, and also often results in better performance of P3DFFT transforms themselves. The (Z,Y,X) layout can be triggered by building the library with –DSTRIDE1 preprocessor flag in the makefile. For more information, see performance section below.
+
+*Table 6.* Mapping of the data array onto processor grid and memory layout
+|| ||*Physical space* || Fourier space ||
+||STRIDE1 defined || N,,x,, , N,,y,,/M,,1,, , N,,z,,/M,,2,,|| N,,z,, , N,,y,,/M,,2,, ,(N,,x,,+2)/(2M,,1,,) ||
+|| STRIDE1 undefined || N,,x,, , N,,y,,/M,,1,, , N,,z,, /M,,2,, || N,,x,,+2)/(2M,,1,,),N,,y,,/M,,2,, ,N,,z,, ||
+
 ===6. Forward (real-to-complex) and backward (complex-to-real) 3D Fourier transforms===
 
 Forward transform is implemented by the p3dfft_ftran_r2c subroutine using the following format:
