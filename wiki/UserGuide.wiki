@@ -1,9 +1,10 @@
 =P3DFFT User Guide=
 
-Version 2.4
+Version 2.5.1
 
-Copyright (C) 2006-2010 Dmitry Pekurovsky
-San Diego Supercomputer Center/UC San Diego
+Copyright (C) 2006-2011 Dmitry Pekurovsky
+Copyright (C) 2006-2011 University of California
+Copyright (C) 2010-2011 Jens Henrik Goebbert
 
 <table border="1" cellpadding="20"><tr><td>
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
@@ -42,6 +43,7 @@ In addition to the library itself, the package includes several sample programs 
 || driver_rand.c, driver_rand.F90 || test_rand_c.x, test_rand_f.x || This program initializes a 3D array with random numbers, then performs forward 3D Fourier transform, then backward transform, and checks that the results are correct, namely the same as in the start except for a normalization factor. It can be used both as a correctness test and for timing the library functions. || 
 || driver_sine.c, driver_sine_inplace.c, driver_sine.F90, driver_sine_ineplace.F90 || test_sine_c.x, test_sine_inplace_c.x, test_sine_f.x, test_sine_inplace_f.x || This program initializes a 3D array with a 3D sine wave, then performs 3D forward Fourier transform, then backward transform, and checks that the results are correct, namely the same as in the start except for a normalization factor. It can be used both as a correctness test and for timing the library functions. ||
 || driver_spec.c, driver_spec.F90 || test_spec_c.x, test_spec_f.x || This program initializes a 3D array with a 3D sine wave, then performs 3D FFT forward transform, and computes power spectrum. ||
+||driver_cheby.f90 || test_cheby_f.x || This program initializes a 3D array with a sine wave, employing a non-uniform grid in the Z dimension with coordinates given by cos(k/N). Then Chebyshev routine is called (p3dfft_cheby) which uses Fourier transform in X and Y and a cosine transform in Z (“ffc”), followed by computation of Chebyshev coefficients. Then backward “cff” transform is called and the results are compared with the expected output after Chebyshev differentiation in Z. This program can be used both as correctness and as a timing test.  ||
 
 ===2. Installing p3dfft ===
 In order to prepare the p3dfft for compiling and installation, you must run the included configure script. Here is a simple example on how to run the configure script:
@@ -120,7 +122,7 @@ In P3DFFT, the decompositions of the output and input arrays, while both being t
 || _start_ || Output || An array containing 3 integers, defining the beginning indices of the local array for the given task within the global grid. || 
 || _end_ || Output || An array containing 3 integers, defining the ending indices of the local array within the global grid (these can be computed from start and size but are provided for convenience). ||
 || _size_ || Output || An array containing 3 integers, defining the local array’s dimensions. || 
-|| _ip_ || Input || An integer argument specifying one of the two choices for array types... ||
+|| _ip_ || Input || ip=1: “Original”: a “physical space” array of real numbers, local in X, distributed among P1 tasks in Y dimension and P2 tasks in Z dimension, where P1 and P2 are processor grid dimensions defined in the call to p3dfft_setup. Usually this type of array is an input to real-to-complex (forward) transform and an output of complex-to-real (backward) transform. ip=2: “Transposed”: a “wavenumber space” array of complex numbers, local in Z, distributed among  P1 tasks in X dimension, P2  tasks in Y dimension. Usually this type of array is an output of real-to-complex (forward) transform and an input to complex-to-real, backward transform. ip=3: The routine returns array memory sizes (as size argument) that are big enough to hold either input or output. This is useful when doing an in-place transform. Start and end are not used.  ||
 
 Note: the layout of the 2D processor grid on the physical network is dependent on the architecture and software of the particular system, and can have some impact on efficiency of communication. By default, rows have processors with adjacent task IDs (this corresponds to "FORTRAN" type ordering). This can be changed to "C" ordering (columns have adjacent task IDs) by building the library with -DDIMS_C preprocessor flag. The former way is recommended on most systems.
 
@@ -139,15 +141,24 @@ Note: the two array types are distributed among processors in a different way fr
 
 Forward transform is implemented by the p3dfft_ftran_r2c subroutine using the following format:
 
-    p3dfft_ftran_r2c(IN,OUT)
+    p3dfft_ftran_r2c(IN,OUT,op)
 
-The input IN is an array of real numbers with dimensions defined by array type with ip=1 (see Table 2 above), with X dimension contained entirely within each task, and Y and Z dimensions distributed among P1 and P2 tasks correspondingly. The output OUT is an array of complex numbers with dimensions defined by array type with ip=2, i.e. Z dimension contained entirely, and X and Y dimensions distributed among P1 and P2 tasks respectively.
+The input IN is an array of real numbers with dimensions defined by array type with ip=1 (see Table 2 above), with X dimension contained entirely within each task, and Y and Z dimensions distributed among P1 and P2 tasks correspondingly. The output OUT is an array of complex numbers with dimensions defined by array type with ip=2, i.e. Z dimension contained entirely, and X and Y dimensions distributed among P1 and P2 tasks respectively. The op argument is a 3-letter character string indicating the type of transform desired. Currently only Fourier transforms are supported in X and Y (denoted by symbol f) and the following transforms in Z:
+*Table 7.* Suuported types of transforms in Z
+|| t or f || Fourier Transform||
+|| c || Cosine Transform||
+|| s || Sine Transform ||
+|| n or 0 || Empty transform (no operation takes place, output is the same as input) ||
+
+Empty transform can be useful for someone implementing custom transform in Z dimension. 
+Example: op=’ffc’ means Fourier transform in X and Y, and a cosine transform in Z. The DCT-I kind of transform is performed (DST-I for sine), the definition of which can be found here:
+http://en.wikipedia.org/wiki/Discrete_cosine_transform#DCT-I
 
 Backward transform is implemented by the p3dfft_btran_c2r subroutine using the following format:
 
-    p3dfft_btran_c2r(IN,OUT)
+    p3dfft_btran_c2r(IN,OUT,op)
 
-The input IN is an array of complex numbers with dimensions defined by array type with ip=2 (see Table 2 above), i.e. Z dimension is contained entirely, and X and Y dimensions are distributed among P1 and P2 tasks correspondingly. The output OUT is an array of real numbers with dimensions defined by array type with ip=1, i.e. X dimension is contained entirely within each task, and Y and Z are dimensions distributed among P1 and P2 tasks respectively.
+The input IN is an array of complex numbers with dimensions defined by array type with ip=2 (see Table 2 above), i.e. Z dimension is contained entirely, and X and Y dimensions are distributed among P1 and P2 tasks correspondingly. The output OUT is an array of real numbers with dimensions defined by array type with ip=1, i.e. X dimension is contained entirely within each task, and Y and Z are dimensions distributed among P1 and P2 tasks respectively. The op argument is similar to forward transform, with the first character of the string being one of t,c,s,n or 0, and the second and third being f. Example: op=’nff’ means no operation in Z, backward Fourier transforms in Y and X.
 
 === 7. Complex array storage definition ===
 
