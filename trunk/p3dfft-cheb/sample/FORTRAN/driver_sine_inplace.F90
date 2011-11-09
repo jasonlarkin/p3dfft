@@ -163,7 +163,7 @@
 
       call p3dfft_get_dims(tmp1,tmp2,memsize,3)
 
-      allocate (B(istart(1):istart+memsize(1)-1,istart(2):istart(2)+memsize(2)-1,istart(3):istart(3)+memsize(3)-1), stat=ierr)
+      allocate (B(istart(1):istart(1)+memsize(1)-1,istart(2):istart(2)+memsize(2)-1,istart(3):istart(3)+memsize(3)-1), stat=ierr)
 
       if(ierr .ne. 0) then
          print *,'Error ',ierr,' allocating array B'
