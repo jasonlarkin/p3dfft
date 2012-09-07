@@ -1,8 +1,12 @@
 #summary Papers and Presentations for P3DFFT
 
- * [http://p3dfft.googlecode.com/svn/docs/SC08_poster.ppt Supercomputing'08 poster presentation]
- * [http://p3dfft.googlecode.com/svn/docs/TG08_DNS.pdf Turbulence Simulations on O(10^4) processors]
- * [http://p3dfft.googlecode.com/svn/docs/SDSC_p3dfft.pdf SDSC article on P3DFFT]
  * [http://p3dfft.googlecode.com/svn/docs/P3DFFT_SISC_final.pdf Paper on P3DFFT] published in SIAM Journal on Scientific Computing. This paper can be cites as follows: 
 
-D. Pekurovsky, "P3DFFT: A FRAMEWORK FOR PARALLEL COMPUTATIONS OF FOURIER TRANSFORMS IN THREE DIMENSIONS", SIAM Journal for Scientific Computing, v. *34*, n. 4, pp. C192-C209 (2012). 
+D. Pekurovsky, "P3DFFT: A FRAMEWORK FOR PARALLEL COMPUTATIONS OF FOURIER TRANSFORMS IN THREE DIMENSIONS", SIAM Journal for Scientific Computing, v. * 34*, n. 4, pp. C192-C209 (2012). 
+ * [http://p3dfft.googlecode.com/svn/docs/P3DFFT_XSEDE_symposium2012.ppt XSEDE ECSS symposium presentation], June 2012.
+ * [http://p3dfft.googlecode.com/svn/docs/SC08_poster.ppt Supercomputing'08 poster presentation]
+ * [http://p3dfft.googlecode.com/svn/docs/TG08_DNS.pdf Turbulence Simulations on O(10^4) processors]
+
+===Old stuff===
+
+ [http://p3dfft.googlecode.com/svn/docs/SDSC_p3dfft.pdf SDSC article on P3DFFT]
