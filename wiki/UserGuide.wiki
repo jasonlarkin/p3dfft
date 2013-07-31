@@ -1,9 +1,9 @@
 =P3DFFT User Guide=
 
-Version 2.5.1
+Version 2.6.1
 
-Copyright (C) 2006-2011 Dmitry Pekurovsky
-Copyright (C) 2006-2011 University of California
+Copyright (C) 2006-2013 Dmitry Pekurovsky
+Copyright (C) 2006-2013 University of California
 Copyright (C) 2010-2011 Jens Henrik Goebbert
 
 <table border="1" cellpadding="20"><tr><td>
@@ -33,7 +33,7 @@ The following is a directory listing for what you should find int he p3dfft pack
 || include/ || The library is provided as a Fortran module. After installation this directory will have p3dfft.mod (for Fortran interface), p3dfft.h (C wrapper/include file), and config.h (header that contains all arguments used when configure script was executed). *^* ||
 || sample/ || This directory has example programs in both FORTRAN and C, in separate subdirectories. Tests provided include out-of-place and in-place transforms 3D FFT, with error checking. Also provided is an example of power spectrum calculation. Example programs will be compiled automatically with the library during make. ||
 
-*^IMPORTRANT:* _In order to use p3dfft with C programs, you must include the p3dfft.h header file in your program. This header file defines an interface that allows C programs to call Fortran functions from the p3dfft library._
+*IMPORTRANT:* _In order to use p3dfft with C programs, you must include the p3dfft.h header file in your program. This header file defines an interface that allows C programs to call Fortran functions from the p3dfft library._
 
 In addition to the library itself, the package includes several sample programs to illustrate how to use p3dfft. These sample programs can be found in the sample/ directory:
 
@@ -55,7 +55,7 @@ The above will prepare p3dfft to be compiled by the PGI compiler with FFTW suppo
 *Table 3:* Arguments of configure script
 || *Argument* || *Notes * || *Description* || *Example* ||
 || --prefix=PREFIX || Mandatory for users without access to /usr/local || This argument will install p3dfft to PREFIX when you run make install. By default, configure will install to /usr/local || --prefix=$HOME/local/ || 
-|| --enable-gnu, --enable-ibm, --enable-intel, --enable-pgi || Mandatory || These arguments will prepare p3dfft to be built by a specific compiler. You must only choose one option. || --enable-pgi ||
+|| --enable-gnu, --enable-ibm, --enable-intel, --enable-pgi, --enable-cray || Mandatory || These arguments will prepare p3dfft to be built by a specific compiler. You must only choose one option. || --enable-pgi ||
 || --enable-fftw, --enable-essl || Mandatory || These arguments will prepare p3dfft to be used with either the FFTW or ESSL library. You must only choose one option. || --enable-fftw ||
 || --with-fftw= _FFTWLOCATION_ || Mandatory if --enable-fftw is used || This argument specifies the path location for the FFTW library; it is mandatory if you are planning to use p3dfft with the FFTW library. || --enable-fftw --with-fftw=$FFTW_HOME ||
 || --enable-oned || Optional, || This argument is for 1D decomposition. The default is 2D decomposition but can be made to 1D by setting up a grid 1xn when running the code. || --enable-oned ||
@@ -80,7 +80,7 @@ More information on how to customize the configure script can be found by callin
 
 $ ./configure --help
 
-For a up-to-date list of configure commands for various platforms such as Kraken, Ranger, and Triton, please refer to the p3dfft wiki page [Install here].
+For a up-to-date list of configure commands for various platforms  please refer to the p3dfft wiki page [Install here].
 
 After you have successfully run the configure script, you are ready to compile and install p3dfft. Simply run:
 
@@ -101,7 +101,10 @@ Before using the library it is necessary to call an initialization routine 'p3df
 || *Argument* || *Intent* || *Description* || 
 || _proc_dims_ || Input || An array of two integers, specifying how the processor grid should be decomposed. Either 1D or 2D decomposition can be specified. For example, when running on 12 processors, (4,3) or (2,6) can be specified as proc_dims to indicate a 2D decomposition, or (1,12) can be specified for 1D decomposition. proc_dims values are used to initialize P1 and P2. ||
 || _nx, ny, nz_ || Input || (Integer) Dimensions of the 3D transform (also the global grid dimensions) || 
+|| _MPI_COMM_IN_	|| Input || (Integer) MPI Communicator containing all MPI tasks that participate in the partition (in most cases this will be MPI_COMM_WORLD).||
+|| _Nx_cut,Ny_cut,Nz_cut_ || Input (optional) || (Integer) Pruned dimensions on output/input (default is same as Nx,Ny,Nz) ||
 || _overwrite_ || Input || (Logical) When set to .true. (or 1 in C) this argument indicates that it is safe to overwrite the input of the btran (backward transform) routine. This may speed up performance of FFTW routines in some cases when non-stride-1 transforms are made. || 
+|| memsize || Output (optional) || Optional argument (array of 3 integers). Memsize can be used to allocate arrays. It contains the dimensions of real-space array that are large enough to contain both input and output of an in-place 3D FFT real-to-complex transform defined by nx,ny,nz,nx_cut,ny_cut,nz_cut. ||
 
 ===5. Array Decomposition===
 
@@ -161,13 +164,15 @@ Backward transform is implemented by the p3dfft_btran_c2r subroutine using the f
 
 The input IN is an array of complex numbers with dimensions defined by array type with ip=2 (see Table 2 above), i.e. Z dimension is contained entirely, and X and Y dimensions are distributed among P1 and P2 tasks correspondingly. The output OUT is an array of real numbers with dimensions defined by array type with ip=1, i.e. X dimension is contained entirely within each task, and Y and Z are dimensions distributed among P1 and P2 tasks respectively. The op argument is similar to forward transform, with the first character of the string being one of t,c,s,n or 0, and the second and third being f. Example: op=’nff’ means no operation in Z, backward Fourier transforms in Y and X.
 
+Sometimes only a subset of output modes is needed to be retained (for forward transform), or a subset of input modes is used, the rest being zeros (for backward transform). Such transforms are called pruned transforms. Leaving off redundant modes can lead to significant savings of time and memory. The reduced dimensions {Nx_cut,Ny_cut and Nz_cut} are arguments to p3dfft_setup. By default they are equal to Nx,Ny,Nz. If they are different from the above (smaller) the output of forward transforms will be reduced in size correspondingly. The input for backward transform will also be smaller in size. It will be automatically padded with zeros until it reaches Nx,Ny,Nz.
+
 === 7. Complex array storage definition ===
 
 Since Fourier transform of a real function has the property of conjugate symmetry, only about half of the complex Fourier coefficients need to be kept. To be precise, if the input array has n real elements, Fourier coefficients F(k) for k=n/2+1,..,n can be dropped as they can be easily restored from the rest of the coefficients. This saves both memory and time. In this version we do not attempt to further pack the complex data. Therefore the output array for the forward transform (and the input array of the backward transform) contains (Nx/2+1) times Ny times Nz complex numbers, with the understanding that Nx/2-1 elements in X direction are missing and can be restored from the remaining elements. As mentioned above, the Nx/2+1 elements in the X direction are distributed among P1 tasks in the transposed layout.
 
 === 8. In-place transforms ===
 
-In and Out arrays can occupy the same space in memory (in-place transform). In this case, it is necessary to make sure that they start in the same location, otherwise the results are unpredictable. Also it is important to remember that the sizes of input and output arrays in general are not equal. The complex array is usually bigger since it contains the Nyquist frequency mode in X direction, in addition to the Nx/2 modes that equal in space to Nx real numbers. However when decomposition is not even, sometimes the real array can be bigger than the complex one, depending on the task ID. Therefore to be safe one must make sure the common-space array is large enough for both input and output. This can be done by finding out dimensions of both original and transposed arrays y calling p3dfft_get_dims two times with ip=1 and 2.
+In and Out arrays can occupy the same space in memory (in-place transform). In this case, it is necessary to make sure that they start in the same location, otherwise the results are unpredictable. Also it is important to remember that the sizes of input and output arrays in general are not equal. The complex array is usually bigger since it contains the Nyquist frequency mode in X direction, in addition to the Nx/2 modes that equal in space to Nx real numbers. However when decomposition is not even, sometimes the real array can be bigger than the complex one, depending on the task ID. Therefore to be safe one must make sure the common-space array is large enough for both input and output. This can be done by using memsize argument when calling p3dfft_setup. It returns the maximum array size for both input and output. Alternatively, one can call p3dfft_get_dims two times with ip=1 and 2. 
 
 In Fortran using in-place transforms is a bit tricky due to language restrictions on subroutine argument types (i.e., one of the arrays is expected to be real and the other complex). In order to overcome this problem wrapper routines are provided, named ftran_r2c and btran_c2r respectively for forward and backward transform (without p3dfft_ prefix). There are examples for such in-place transform in the sample/ subdirectory. These wrappers can be also used for out-of-place transforms just as well.
 
@@ -177,11 +182,11 @@ Besides the input and output arrays (which can occupy the same space, as mention
 
 === 10. Performance considerations===
 
-P3DFFT was created to compute 3D FFT in parallel with high efficiency. In particular it is aimed for applications where the data volume is large. It is especially useful when running applications on ultra-scale parallel platforms where one-dimensional decomposition is not adequate. Since P3DFFT was designed to be portable, no effort is made to do architecture-specific optimization. However, the user is given some choices in setting up the library, mentioned below, that may affect performance on a given system. Current version of P3DFFT uses ESSL or FFTW library for it 1D FFT routines. ESSL [1] provides FFT routines highly optimized for IBM platforms it is built on. The FFTW [2], while being generic, also makes an effort to maximize performance on many kinds of architectures. Some performance data will be uploaded at the P3DFFT Web site. For more questions and comments please contact dmitry@sdsc.edu. 
+P3DFFT was created to compute 3D FFT in parallel with high efficiency. In particular it is aimed for applications where the data volume is large. It is especially useful when running applications on ultra-scale parallel platforms where one-dimensional decomposition is not adequate. Since P3DFFT was designed to be portable, no effort is made to do architecture-specific optimization. However, the user is given some choices in setting up the library, mentioned below, that may affect performance on a given system. Current version of P3DFFT uses ESSL or FFTW library for it 1D FFT routines. ESSL {{{[1]}}} provides FFT routines highly optimized for IBM platforms it is built on. The FFTW {{{[2]}}}, while being generic, also makes an effort to maximize performance on many kinds of architectures. Some performance data will be uploaded at the P3DFFT Web site. For more questions and comments please contact dmitry@sdsc.edu. 
 
 Optimal performance on many parallel platforms for a given number of cores and problem size will likely depend on the choice of processor decomposition. For example, given a processor grid P1 x P2 (specified in the first argument to p3dfft_setup) performance will generally be better with smaller P1 (with the product P1 x P2 kept constant). Ideally P1 will be equal or less than the number of cores on an SMP node or a multi-core chip. In addition, the closer a decomposition is to being even, the better load balancing. 
 
-Performance is likely to be better when P3DFFT is built using –-enable-stride1 during configure. This implies stride-1 data ordering for FFTs. Note that using this argument changes the memory layout of the transposed array (see section 3 for explanation). To help tune performance further, two more arguments can be used: -enable-dnblx=… and –-enable-dnbly=…, which define block sizes in X and Y when doing local array reordering. Choosing suitable block sizes allows the program to optimize cache performance. 
+Performance is likely to be better when P3DFFT is built using –-enable-stride1 during configure. This implies stride-1 data ordering for FFTs. Note that using this argument changes the memory layout of the transposed array (see section 3 for explanation). To help tune performance further, two more arguments can be used: -enable-dnblx=… and –-enable-dnbly=…, which define block sizes in X and Y when doing local array reordering. Choosing suitable block sizes allows the program to optimize cache performance, although by default  P3DFFT chooses these values based on a good guess according to cache size. 
    
 Finally, performance will be better if overwrite parameter is set to .true. (or 1 in C) when initializing P3DFFT. This allows the library to overwrite the input array, which results in significantly faster execution when not using the –enable-stride1 argument.  
 
