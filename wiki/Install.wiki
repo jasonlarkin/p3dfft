@@ -60,3 +60,24 @@ as needed. If you wish to share more examples or to request or contribute in sup
 = Compiling on NCSA (Abe) =
 || *Compiler* || *SoftEnv Key* || *Arguments* ||
 || Intel || +fftw-3.1-intel, +openmpi-1.3.2-intel || ./configure --enable-intel --enable-fftw --with-fftw="$FFTW_HOME" FCFLAGS="-O3 -xW -132 -fpp -vec_report0" CFLAGS="-O3 -xW -vec_report0" LDFLAGS="-lmpi_f90 -lmpi_f77 -limf" ||
+
+= Compiling on Stampede =
+|| *Compiler* || *Modules* || *Arguments* ||
+|| Intel || fftw3 || ./configure --enable-fftw --enable-intel --with-fftw=$TACC_FFTW3_DIR FC=mpif90 CC=mpicc|| 
+
+= Compiling on Gordon =
+|| *Compiler* || *Modules* || *Arguments* ||
+|| PGI || pgi, fftw, mvapich2_ib || ./configure --enable-pgi --enable-fftw --with-fftw=$FFTWHOME FC=mpif90 CC=mpicc ||
+|| Intel || intel, fftw, mvapich2_ib || ./configure --enable-intel --enable-fftw --with-fftw=$FFTWHOME FC=mpif90 CC=mpicc||
+|| GNU || gnu, fftw, mvapich2_ib || ./configure --enable-intel --enable-fftw --with-fftw=$FFTWHOME FC=mpif90 CC=mpicc || 
+
+= Compiling on Hopper =
+|| *Compiler* || *Modules* || *Arguments* ||
+|| PGI || PrgEnv-pgi, fftw || ./configure --enable-pgi --enable-fftw --with-fftw=$FFTW_DIR/.. FC=ftn CC=cc ||
+|| Intel || PrgEnv-intel, fftw|| ./configure --enable-intel --enable-fftw --with-fftw=$FFTW_DIR/.. FC=ftn CC=cc||
+|| GNU || PrgEnv-gnu, fftw || ./configure --enable-gnu --enable-fftw --with-fftw=$FFTW_DIR/.. FC=ftn CC=cc|| 
+|| Cray || PrgEnv-cray, fftw || ./configure --enable-cray --enable-fftw --with-fftw=$FFTW_DIR/.. FC=ftn CC=cc|| 
+
+= Compiling on Blacklight =
+|| *Compiler* || *Modules* || *Arguments* ||
+|| Intel || fftw || ./configure --enable-fftw --enable-intel --with-fftw=$FFTW_LIB/.. CC=icc FC=ifort FCFLAGS=-lmpi|| 
