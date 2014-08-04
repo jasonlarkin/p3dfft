@@ -73,10 +73,10 @@ as needed. If you wish to share more examples or to request or contribute in sup
 
 = Compiling on Hopper =
 || *Compiler* || *Modules* || *Arguments* ||
-|| PGI || PrgEnv-pgi, fftw || ./configure --enable-pgi --enable-fftw --with-fftw=$FFTW_DIR/.. FC=ftn CC=cc ||
-|| Intel || PrgEnv-intel, fftw|| ./configure --enable-intel --enable-fftw --with-fftw=$FFTW_DIR/.. FC=ftn CC=cc||
-|| GNU || PrgEnv-gnu, fftw || ./configure --enable-gnu --enable-fftw --with-fftw=$FFTW_DIR/.. FC=ftn CC=cc|| 
-|| Cray || PrgEnv-cray, fftw || ./configure --enable-cray --enable-fftw --with-fftw=$FFTW_DIR/.. FC=ftn CC=cc|| 
+|| PGI || +PrgEnv-pgi, fftw || ./configure --enable-pgi --enable-fftw --with-fftw=$FFTW_DIR/.. FC=ftn CC=cc ||
+|| Intel || +PrgEnv-intel, fftw|| ./configure --enable-intel --enable-fftw --with-fftw=$FFTW_DIR/.. FC=ftn CC=cc||
+|| GNU || +PrgEnv-gnu, fftw || ./configure --enable-gnu --enable-fftw --with-fftw=$FFTW_DIR/.. FC=ftn CC=cc|| 
+|| Cray || +PrgEnv-cray, fftw || ./configure --enable-cray --enable-fftw --with-fftw=$FFTW_DIR/.. FC=ftn CC=cc|| 
 
 = Compiling on Blacklight =
 || *Compiler* || *Modules* || *Arguments* ||
