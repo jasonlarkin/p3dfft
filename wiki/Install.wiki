@@ -38,11 +38,12 @@ as needed. If you wish to share more examples or to request or contribute in sup
 || CFLAGS="<C compiler flags>" || Optional, recommended || C compiler flags || CFLAGS="-fastsse" ||
 || LDFLAGS="<linker flags>" || Mandatory (depending on platform) || Linker flags || LDFLAGS=-lmpi_f90 -lmpi_f77" ||
 
-= Compiling on Gordon (SDSC)=
+= Compiling on Gordon/Trestles (SDSC)=
 || *Compiler* || *Modules* || *Arguments* ||
 || PGI || pgi, fftw, mvapich2_ib || ./configure --enable-pgi --enable-fftw --with-fftw=$FFTWHOME FC=mpif90 CC=mpicc ||
 || Intel || intel, fftw, mvapich2_ib || ./configure --enable-intel --enable-fftw --with-fftw=$FFTWHOME FC=mpif90 CC=mpicc||
 || GNU || gnu, fftw, mvapich2_ib || ./configure --enable-intel --enable-fftw --with-fftw=$FFTWHOME FC=mpif90 CC=mpicc || 
+ 
 
 = Compiling on Triton (SDSC) =
 || *Compiler* || *Modules* || *Arguments* ||
