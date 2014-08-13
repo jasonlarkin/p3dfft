@@ -116,7 +116,7 @@ The p3dfft module also specifies mytype, which is the type of real and complex n
 ===4. Initialization===
 Before using the library it is necessary to call an initialization routine 'p3dfft_setup'.
 
-*Usage:* _p3dfft_setup(proc_dims,nx,ny,nz,overwrite)_
+*Usage:* _p3dfft_setup(proc_dims,nx,ny,nz,mpi_comm_in,nx_cut,ny_cut,nz_cut,overwrite,memsize)_
 
 *Table 4:* Arguments of p3dfft_setup
 || *Argument* || *Intent* || *Description* || 
