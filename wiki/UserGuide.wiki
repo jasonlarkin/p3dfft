@@ -2,8 +2,8 @@
 
 Version 2.7.1
 
-Copyright (C) 2006-2013 Dmitry Pekurovsky
-Copyright (C) 2006-2013 University of California
+Copyright (C) 2006-2014 Dmitry Pekurovsky
+Copyright (C) 2006-2014 University of California
 Copyright (C) 2010-2011 Jens Henrik Goebbert
 
 <table border="1" cellpadding="20"><tr><td>
