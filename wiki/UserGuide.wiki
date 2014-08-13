@@ -221,7 +221,7 @@ P3DFFT was created to compute 3D FFT in parallel with high efficiency. In partic
 Optimal performance on many parallel platforms for a given number of cores and problem size will likely depend on the choice of processor decomposition. For example, given a processor grid P1 x P2 (specified in the first argument to p3dfft_setup) performance will generally be better with smaller P1 (with the product P1 x P2 kept constant). Ideally P1 will be equal or less than the number of cores on an SMP node or a multi-core chip. In addition, the closer a decomposition is to being even, the better load balancing. 
 
 Performance is likely to be better when P3DFFT is built using –-enable-stride1 during configure. This implies stride-1 data ordering for FFTs. Note that using this argument changes the memory layout of the transposed array (see section 3 for explanation). To help tune performance further, two more arguments can be used: -enable-dnblx=… and –-enable-dnbly=…, which define block sizes in X and Y when doing local array reordering. Choosing suitable block sizes allows the program to optimize cache performance, although by default  P3DFFT chooses these values based on a good guess according to cache size. 
-   
+
 Finally, performance will be better if overwrite parameter is set to .true. (or 1 in C) when initializing P3DFFT. This allows the library to overwrite the input array, which results in significantly faster execution when not using the –enable-stride1 argument.  
 
 
