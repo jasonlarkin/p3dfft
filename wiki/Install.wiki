@@ -33,7 +33,7 @@ as needed. If you wish to share more examples or to request or contribute in sup
 || --enable-nblz || Optional || To define loop blocking factor NBL_Z || --enable-nblz=32 ||
 || --enable-single || Optional || This argument will compile p3dfft in single-precision. By default, configure will setup p3dfft to be compiled in double-precision. || --enable-single || 
 || FC=<Fortran compiler> || Optional || Fortran compiler || FC=mpfort ||
-|| FCFLAGS="<Fortran compiler flags>" || Optional, recommended || Fortran compiler falgs || FCFLAGS="-Mextend" ||
+|| FCFLAGS="<Fortran compiler flags>" || Optional, recommended || Fortran compiler flags || FCFLAGS="-Mextend" ||
 || CC=<C compiler> || Optional || C compiler || CC=mpcc ||
 || CFLAGS="<C compiler flags>" || Optional, recommended || C compiler flags || CFLAGS="-fastsse" ||
 || LDFLAGS="<linker flags>" || Mandatory (depending on platform) || Linker flags || LDFLAGS=-lmpi_f90 -lmpi_f77" ||
