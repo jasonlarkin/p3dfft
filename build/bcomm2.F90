@@ -45,8 +45,9 @@
       integer rcvcnts(0:iproc-1)
       integer sndstrt(0:iproc-1)
       integer rcvstrt(0:iproc-1)
+      complex(mytype) buf1(buf_size*nv), buf2(buf_size*nv)
 
-      tc = tc - MPI_Wtime()
+!      tc = tc - MPI_Wtime()
 
 ! Pack and exchange x-z buffers in rows
       
@@ -96,8 +97,8 @@
       enddo
       enddo
 
-      tc = tc + MPI_Wtime() 
-      t = t - MPI_Wtime() 
+!      tc = tc + MPI_Wtime() 
+!      t = t - MPI_Wtime() 
 
 #ifdef USE_EVEN
       call mpi_alltoall (buf1,IfCntMax*nv,mpi_byte, buf2,IfCntMax*nv,mpi_byte,mpi_comm_row,ierr)
@@ -110,8 +111,8 @@
       call mpi_alltoallv (buf1,SndCnts, SndStrt, mpi_byte, buf2,RcvCnts,RcvStrt,mpi_byte,mpi_comm_row,ierr)
 #endif
 
-      t = t + MPI_Wtime() 
-      tc = tc - MPI_Wtime()
+!      t = t + MPI_Wtime() 
+!      tc = tc - MPI_Wtime()
 
 ! Unpack receive buffers into dest
 
@@ -146,7 +147,7 @@
       enddo
       enddo
 
-      tc = tc + MPI_Wtime() 
+!      tc = tc + MPI_Wtime() 
       
       return
       end subroutine
@@ -165,10 +166,14 @@
       real(r8) t,tc
       integer x,y,z,i,ierr,ix,iy,x2,y2,l
       integer(i8) position,pos1,pos0,pos2
+      complex(mytype), allocatable :: buf1(:),buf2(:)
 
       tc = tc - MPI_Wtime()
 
 ! Pack and exchange x-z buffers in rows
+
+     allocate(buf1(buf_size))
+     allocate(buf2(buf_size))
       
       do i=0,iproc-1
 
@@ -217,11 +222,19 @@
       tc = tc + MPI_Wtime() 
       t = t - MPI_Wtime() 
 
+! !$OMP BARRIER
+
+!$OMP ordered
+
 #ifdef USE_EVEN
       call mpi_alltoall (buf1,IfCntMax,mpi_byte, buf2,IfCntMax,mpi_byte,mpi_comm_row,ierr)
 #else
       call mpi_alltoallv (buf1,KrSndCnts, KrSndStrt, mpi_byte, buf2,KrRcvCnts,KrRcvStrt,mpi_byte,mpi_comm_row,ierr)
 #endif
+
+!$OMP end ordered
+
+      deallocate(buf1)
 
       t = t + MPI_Wtime() 
       tc = tc - MPI_Wtime()
@@ -253,6 +266,7 @@
 	 enddo	
       enddo
 
+      deallocate(buf2)
       tc = tc + MPI_Wtime() 
       
       return

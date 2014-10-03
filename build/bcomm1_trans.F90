@@ -28,150 +28,72 @@
 ! Transpose back Z to Y pencils
 ! Assumes stride1 data structure
 
-      subroutine bcomm1_trans_many (source,dest,dim,nv,op,t,tc)
+      subroutine bcomm1_trans (source,dest,op,t,tc)
 !========================================================
 
       use fft_spec
       implicit none
 
-      integer j,nv,nz,dim
+      integer j,nv,nz,dim,ierr
 ! Assume STRIDE1
-!      complex(mytype) source(nzc,jjsize,iisize,nv)
-      complex(mytype) source(dim,nv)
-      complex(mytype), allocatable :: buf3(:,:)
-      complex(mytype) dest(ny_fft,iisize,kjsize,nv)
+      complex(mytype) source(nzc,jjsize,iisize)
+      complex(mytype) dest(ny_fft,iisize,kjsize)
+      complex(mytype), allocatable :: buf1(:), buf2(:)
 
       real(r8) t,tc
-      integer x,y,z,i,ierr,xs,ys,iy,y2,z2,ix,x2,n,iz,dny,dnz
-      integer(i8) position,pos1,pos0
       character(len=3) op
-      integer sndcnts(0:jproc-1)
-      integer rcvcnts(0:jproc-1)
-      integer sndstrt(0:jproc-1)
-      integer rcvstrt(0:jproc-1)
 
       nz = nz_fft
 
 !     Pack the data for sending
       
-      tc = tc - MPI_Wtime()
+!      tc = tc - MPI_Wtime()
 
-      allocate(buf3(nz_fft,jjsize))
+        allocate(buf1(buf_size))
+        allocate(buf2(buf_size))
 
-     if(jjsize .gt. 0) then
-        do j=1,nv
-          call pack_bcomm1_trans(buf1,source(1,j),buf3,j,nv,op)     
-	enddo
-     endif
+        if(jjsize .gt. 0) then
+          call pack_bcomm1_trans(buf1,source,op)     
+        endif
 
-      tc = tc + MPI_Wtime()
-      t = t - MPI_Wtime() 
+!      tc = tc + MPI_Wtime()
+!      t = t - MPI_Wtime() 
+
+!$OMP ORDERED
 
 #ifdef USE_EVEN
-      call mpi_alltoall(buf1,KfCntMax*nv, mpi_byte, buf2,KfCntMax*nv,mpi_byte,mpi_comm_col,ierr)
+      call mpi_alltoall(buf1,KfCntMax, mpi_byte, buf2,KfCntMax,mpi_byte,mpi_comm_col,ierr)
 #else
-      sndcnts = JrSndCnts * nv
-      sndstrt = JrSndStrt * nv
-      rcvcnts = JrRcvCnts * nv
-      rcvstrt = JrRcvStrt * nv
 
-      call mpi_alltoallv(buf1,SndCnts, SndStrt,mpi_byte, buf2,RcvCnts, RcvStrt,mpi_byte,mpi_comm_col,ierr)
+      call mpi_alltoallv(buf1,JrSndCnts, JrSndStrt,mpi_byte, buf2,JrRcvCnts, JrRcvStrt,mpi_byte,mpi_comm_col,ierr)
 #endif
+!$OMP END ORDERED
 
-      t = t + MPI_Wtime() 
-      tc = tc - MPI_Wtime()
+!      t = t + MPI_Wtime() 
+!      tc = tc - MPI_Wtime()
 
-! Unpack receive buffers into dest
+      deallocate(buf1)
+      call unpack_bcomm1_trans(dest,buf2)
 
-      call unpack_bcomm1_trans_many(dest,buf2,nv)
+      deallocate(buf2)
 
-
-      deallocate(buf3)
-
-      tc = tc + MPI_Wtime()
+!      tc = tc + MPI_Wtime()
       
       return
       end subroutine
 
-      subroutine unpack_bcomm1_trans_many(dest,buf2,nv)
-
-      complex(mytype) dest(ny_fft,iisize,kjsize,nv)
-      complex(mytype) buf2(ny_fft*iisize*kjsize*nv)
-      integer i,j,nv,position,pos0,pos1,x,y,z,dny      
-
-      dny = ny_fft - nyc
-      do i=0,jproc-1
-#ifdef USE_EVEN
-         pos0 = i*KfCntMax *nv/(mytype*2) +  1 
-#else
-         pos0 = JrRcvStrt(i) *nv/(mytype*2)+ 1 
-#endif
-	do j=1,nv
-	 do z=1,kjsize
-            pos1 = pos0
-            do x=1,iisize
-               position = pos1
-! If clearly in the first half of ny
-               if(jjen(i) .le. nyhc) then
-                  do y=jjst(i),jjen(i)
-                     dest(y,x,z,j) = buf2(position) 
-                     position = position+1
-                  enddo
-! If clearly in the second half of ny
-               else if (jjst(i) .ge. nyhc+1) then
-                  do y=jjst(i)+dny,jjen(i)+dny
-                     dest(y,x,z,j) = buf2(position)
-                     position = position +1
-                  enddo
-
-! If spanning the first and second half of nz (i.e. jproc is odd)  
-              else
-                  do y=jjst(i),nyhc
-                     dest(y,x,z,j) = buf2(position)
-                     position = position +1
-   		  enddo
-                  do y=ny_fft-nyhc+1,jjen(i)+dny
-                     dest(y,x,z,j) = buf2(position)
-                     position = position +1
-                  enddo
-               endif
-               pos1 = pos1 + jjsz(i)
-            enddo
-            pos0 = pos0 + jjsz(i)*iisize
-         enddo
-	 enddo
-      enddo
 
 
-! Fill center in Y with zeros
-      if(dny .ne. 0) then	
-        do j=1,nv
-         do z=1,kjsize
-            do x=1,iisize
-               do y=nyhc+1,ny_fft-nyhc
-	          dest(y,x,z,j) = 0.0
-               enddo
-            enddo
-         enddo
-        enddo
-      endif
-
-      return
-      end subroutine
-
-
-      subroutine pack_bcomm1_trans(sendbuf,source,buf3,j,nv,op)
+!-------------------------------------------------------
+      subroutine pack_bcomm1_trans(sendbuf,source,op)
 
       implicit none
 
       complex(mytype) source(nzc,jjsize,iisize)
-#ifdef USE_EVEN
-      complex(mytype) sendbuf(KfCntMax*nv*jproc/(mytrype*2))
-#else
-      complex(mytype) sendbuf(nzc*jjsize*iisize*nv)
-#endif
       complex(mytype) buf3(nz_fft,jjsize)
-      integer nz,dnz,i,j,x,y,z,iz,iy,z2,y2,ierr,nv
+      complex(mytype) sendbuf(buf_size)
+
+      integer nz,dnz,i,x,y,z,iz,iy,z2,y2,ierr
       integer*8 position,pos0,pos1,pos2
       character(len=3) op
 
@@ -184,10 +106,9 @@
             do i=0,jproc-1
             
 #ifdef USE_EVEN
-               pos0 = (i*nv + j-1) * KfCntMax/ (mytype*2) + (x-1)*jjsize 
+               pos0 = i * KfCntMax/ (mytype*2) + (x-1)*jjsize 
 #else
-               pos0 = JrSndStrt(i) *nv/ (mytype*2) + (x-1)*jjsize 
-               pos0 = pos0 +(j-1)*kjsz(i)*iisize*jjsize
+               pos0 = JrSndStrt(i) / (mytype*2) + (x-1)*jjsize 
 #endif
 	       
 	       pos1 = pos0
@@ -326,10 +247,9 @@
             
 
 #ifdef USE_EVEN
-               pos0 = (i*nv + j-1) * KfCntMax/ (mytype*2) + (x-1)*jjsize 
+               pos0 = i * KfCntMax/ (mytype*2) + (x-1)*jjsize 
 #else
-               pos0 = JrSndStrt(i) *nv/ (mytype*2) + (x-1)*jjsize 
-               pos0 = pos0 +(j-1)*kjsz(i)*iisize*jjsize
+               pos0 = JrSndStrt(i) / (mytype*2) + (x-1)*jjsize 
 #endif
 	       pos1 = pos0 
                do z=kjst(i),kjen(i),NBz
@@ -350,77 +270,32 @@
                         pos2 = pos2 + iisize * jjsize
                      enddo
                   enddo
-                  pos1 = pos1 + iisize*jjsize*NBz
+               pos1 = pos1 + iisize*jjsize*NBz
                enddo
-!	       pos0 = pos0 + iisize*jjsize*kjsz(i)
-            enddo
+	       pos0 = pos0 + iisize*jjsize*kjsz(i)
+	       enddo
 
-         enddo
+            enddo
 
 	endif
 
 	return
 	end subroutine
 
-      subroutine bcomm1_trans (source,dest,op,t,tc)
-!========================================================
+
+
+      subroutine unpack_bcomm1_trans(dest,recvbuf)
 
       use fft_spec
       implicit none
 
-! Assume STRIDE1
-      complex(mytype) source(nzc,jjsize,iisize)
-      complex(mytype), allocatable :: buf3(:,:)
       complex(mytype) dest(ny_fft,iisize,kjsize)
+      complex(mytype) recvbuf(buf_size)
 
-      real(r8) t,tc
       integer x,y,z,i,ierr,xs,ys,iy,y2,z2,ix,x2,n,iz,dny,dnz
       integer(i8) position,pos1,pos0
-      character(len=3) op
-
-
-!     Pack the data for sending
-
-      tc = tc - MPI_Wtime()
-
-      allocate(buf3(nz_fft,jjsize))
-
-      call pack_bcomm1_trans(buf1,source,buf3,1,1,op)     
-
-
-      tc = tc + MPI_Wtime()
-      t = t - MPI_Wtime() 
-#ifdef USE_EVEN
-      call mpi_alltoall(buf1,KfCntMax, mpi_byte, buf2,KfCntMax,mpi_byte,mpi_comm_col,ierr)
-#else
-! Use MPI_Alltoallv
-
-      t = t + MPI_Wtime() 
-      tc = tc - MPI_Wtime()
-         
-      call mpi_alltoallv(buf1,JrSndCnts, JrSndStrt,mpi_byte, buf2,JrRcvCnts, JrRcvStrt,mpi_byte,mpi_comm_col,ierr)
-#endif
-
-      t = t + MPI_Wtime() 
-      tc = tc - MPI_Wtime()
-      
-      call unpack_bcomm1_trans(dest,buf2)
-
 
 ! Unpack receive buffers into dest
-
-      deallocate(buf3)
-
-      tc = tc + MPI_Wtime()
-      
-      return
-      end subroutine
-
-      subroutine unpack_bcomm1_trans(dest,buf2)
-
-      complex(mytype) dest(ny_fft,iisize,kjsize)
-      complex(mytype) buf2(ny_fft*iisize*kjsize)
-      integer i,dny,position,pos0,pos1,x,y,z
 
       dny = ny_fft - nyc
       do i=0,jproc-1
@@ -436,24 +311,24 @@
 ! If clearly in the first half of ny
                if(jjen(i) .le. nyhc) then
                   do y=jjst(i),jjen(i)
-                     dest(y,x,z) = buf2(position) 
+                     dest(y,x,z) = recvbuf(position) 
                      position = position+1
                   enddo
 ! If clearly in the second half of ny
                else if (jjst(i) .ge. nyhc+1) then
                   do y=jjst(i)+dny,jjen(i)+dny
-                     dest(y,x,z) = buf2(position)
+                     dest(y,x,z) = recvbuf(position)
                      position = position +1
                   enddo
 
 ! If spanning the first and second half of nz (i.e. jproc is odd)  
               else
                   do y=jjst(i),nyhc
-                     dest(y,x,z) = buf2(position)
+                     dest(y,x,z) = recvbuf(position)
                      position = position +1
    		  enddo
                   do y=ny_fft-nyhc+1,jjen(i)+dny
-                     dest(y,x,z) = buf2(position)
+                     dest(y,x,z) = recvbuf(position)
                      position = position +1
                   enddo
                endif
@@ -474,5 +349,5 @@
          enddo
       endif
 
-      return 
+      return
       end subroutine

@@ -4,8 +4,8 @@
 !
 !    Software Framework for Scalable Fourier Transforms in Three Dimensions
 !
-!    Copyright (C) 2006-2014 Dmitry Pekurovsky
-!    Copyright (C) 2006-2014 University of California
+!    Copyright (C) 2006-2010 Dmitry Pekurovsky
+!    Copyright (C) 2006-2010 University of California
 !    Copyright (C) 2010-2011 Jens Henrik Goebbert
 !
 !    This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,7 @@
 ! Transpose Y and Z pencils
 ! Assume Stride1 data structure
 
-      subroutine fcomm2_trans_many(source,dest,buf3,dim_out,nv,op,t,tc)
+      subroutine fcomm2_trans(source,dest,op,t,tc)
 !========================================================
 
       use fft_spec
@@ -36,13 +36,15 @@
 
 ! Assume stride1
       integer nz,dim_out
-      complex(mytype) source(ny_fft,iisize,kjsize,nv)
-      complex(mytype) dest(dim_out,nv)
-      complex(mytype) buf3(nz_fft,jjsize)
+      complex(mytype) source(ny_fft,iisize,kjsize)
+      complex(mytype) dest(nzc,jjsize,iisize)
+!      complex(mytype) buf3(nz_fft,jjsize)
+      complex(mytype), allocatable :: buf1(:),buf2(:)
 
       real(r8) t,tc
-      integer x,z,y,i,ierr,xs,ys,y2,z2,iy,iz,ix,x2,n,sz,l,dny,dnz,nv,j
+      integer x,z,y,i,ierr,xs,ys,y2,z2,iy,iz,ix,x2,n,sz,l,dny,dnz
       integer(i8) position,pos1,pos0,pos2
+      integer threadid,omp_get_thread_num
       character(len=3) op
       integer sndcnts(0:jproc-1)
       integer rcvcnts(0:jproc-1)
@@ -53,72 +55,134 @@
 ! Pack send buffers for exchanging y and z for all x at once 
 
 
-      tc = tc - MPI_Wtime()
-      call pack_fcomm2_trans_many(buf1,source,nv)
+!      tc = tc - MPI_Wtime()
+
+!      if(taskid .eq. 0) then
+!         print *,'Entering fcomm2_trans; source='
+!      endif
+!      do j=1,nv
+!      print *,taskid,':, j=',j
+!      call print_buf(source(1,1,1,j),ny_fft,iisize,kjsize)
+!      enddo
 
 
-      tc = tc + MPI_Wtime()
-      t = t - MPI_Wtime()
+     allocate(buf1(buf_size))
+     allocate(buf2(buf_size))
+
+      threadid = OMP_GET_THREAD_NUM()
+#ifdef DEBUG
+      print *,taskid,threadid,": Entered fcomm2_trans"
+!$OMP FLUSH
+#endif
+
+     call pack_fcomm2_trans(buf1,source)
+
+!      tc = tc + MPI_Wtime()
+
+#ifdef DEBUG
+      print *,taskid,threadid,": Passed barrier in fcomm2_trans"
+!$OMP FLUSH
+#endif
+!      t = t - MPI_Wtime()
+
+
+!$OMP ORDERED
 
 #ifdef USE_EVEN
-      call mpi_alltoall(buf1,KfCntMax*nv, mpi_byte, buf2,KfCntMax*nv, mpi_byte,mpi_comm_col,ierr)
+      call mpi_alltoall(buf1,KfCntMax, mpi_byte, buf2,KfCntMax, mpi_byte,mpi_comm_col,ierr)
 #else      
 ! Exchange y-z buffers in columns of processors
 
-      sndcnts = KfSndCnts * nv
-      sndstrt = KfSndStrt * nv
-      rcvcnts =KfRcvCnts * nv
-      rcvstrt = KfRcvStrt * nv
-
-      call mpi_alltoallv(buf1,SndCnts, SndStrt,mpi_byte,buf2,RcvCnts, RcvStrt,mpi_byte,mpi_comm_col,ierr)
+#ifdef DEBUG
+      print *,taskid,threadid,": Calling alltoall in fcomm2_trans"
+!$OMP FLUSH
+#endif
+      call mpi_alltoallv(buf1,KfSndCnts, KfSndStrt,mpi_byte,buf2,KfRcvCnts, KfRcvStrt,mpi_byte,mpi_comm_col,ierr)
 #endif
 
-      t = MPI_Wtime() + t
+!$OMP END ORDERED
+
+#ifdef DEBUG
+      print *,taskid,threadid,": Passed alltoall in fcomm2_trans"
+!$OMP FLUSH
+#endif
+
+!      t = MPI_Wtime() + t
+
+	deallocate(buf1)
 
      if(jjsize .gt. 0) then
 
-      tc = - MPI_Wtime() + tc
+!      tc = - MPI_Wtime() + tc
 	
-      do j=1,nv
-         call unpack_fcomm2_trans(dest(1,j),buf2,buf3,j,nv,op)
-      enddo
+      call unpack_fcomm2_trans(dest,buf2,op)
 
-      tc = tc + MPI_Wtime()
+!      tc = tc + MPI_Wtime()
 
-     endif	
+     endif
+
+
+!      if(taskid .eq. 0) then
+!         print *,'Exiting fcomm2_trans; dest='
+!      endif
+!      do j=1,nv
+!      print *,taskid,':, j=',j
+!      call print_buf(dest(1,1,1,j),nz_fft,jjsize,iisize)
+!      enddo
+	
+
+	deallocate(buf2)
+!	enddo	
+
+#ifdef DEBUG
+      print *,taskid,threadid,": Exiting fcomm2_trans"
+!$OMP FLUSH
+#endif
 
       return
       end subroutine
 
-      subroutine pack_fcomm2_trans_many(sndbuf,source,nv)
+!------------------------------------------------------------
+      subroutine pack_fcomm2_trans(sendbuf,source)
 
       use fft_spec
       implicit none
 
-      complex(mytype) source(ny_fft,iisize,kjsize,nv)
-      complex(mytype) sndbuf(iisize*kjsize*ny_fft*nv)
-      integer nv,j,i,x,y,z,pos0,position,dny,pos1
+      complex(mytype) source(ny_fft,iisize,kjsize)
+#ifdef USE_EVEN
+      complex(mytype) sendbuf(KfCntMax)
+#else
+      complex(mytype) sendbuf(ny_fft*iisize*kjsize)
+#endif
+      integer x,z,y,i,y2,z2,iy,iz,ix,x2,dny
+      integer(i8) position,pos1,pos0,pos2
+      integer threadid,OMP_GET_THREAD_NUM
 
+
+#ifdef DEBUG
+      threadid = OMP_GET_THREAD_NUM()
+      print *,taskid,threadid,": Entered pack_fcomm2_trans"
+!$OMP FLUSH
+#endif
       dny = ny_fft-nyc
+
       do i=0,jproc-1
 #ifdef USE_EVEN
-         pos0 = i * nv *KfCntMax/(mytype*2)  + 1 
+         pos0 = i * KfCntMax/(mytype*2)  + 1 
 #else
-         pos0 = KfSndStrt(i)*nv /(mytype*2)+ 1 
+         pos0 = KfSndStrt(i) /(mytype*2)+ 1 
 #endif
 
-        do j=1,nv
 
 ! Pack the sendbuf, omitting the center ny-nyc elements in Y dimension
 
 ! If clearly in the first half of ny
-        pos1 = pos0 + (j-1)*jjsz(i)*iisize*kjsize
          if(jjen(i) .le. nyhc) then
      	    do z=1,kjsize
-               position = pos1 +(z-1)*jjsz(i)*iisize
+               position = pos0 +(z-1)*jjsz(i)*iisize
                do x=1,iisize
                   do y=jjst(i),jjen(i)
-                     sndbuf(position) = source(y,x,z,j)
+                     sendbuf(position) = source(y,x,z)
                      position = position+1
                   enddo
                enddo	
@@ -127,10 +191,10 @@
 ! If clearly in the second half of ny
          else if (jjst(i) .ge. nyhc+1) then
      	    do z=1,kjsize
-               position = pos1 +(z-1)*jjsz(i)*iisize
+               position = pos0 +(z-1)*jjsz(i)*iisize
                do x=1,iisize
                   do y=jjst(i)+dny,jjen(i)+dny
-                     sndbuf(position) = source(y,x,z,j)
+                     sendbuf(position) = source(y,x,z)
                      position = position+1
                   enddo
                enddo	
@@ -141,14 +205,14 @@
 ! If spanning the first and second half of ny (e.g. iproc is odd)
          else
      	    do z=1,kjsize
-               position = pos1 +(z-1)*jjsz(i)*iisize
+               position = pos0 +(z-1)*jjsz(i)*iisize
                do x=1,iisize
                   do y=jjst(i),nyhc
-                     sndbuf(position) = source(y,x,z,j)
+                     sendbuf(position) = source(y,x,z)
                      position = position+1
                   enddo
                   do y=ny_fft-nyhc+1,jjen(i)+dny
-                     sndbuf(position) = source(y,x,z,j)
+                     sendbuf(position) = source(y,x,z)
                      position = position+1
                   enddo
                enddo	
@@ -156,11 +220,16 @@
          endif
 
       enddo
-      enddo
 
+#ifdef DEBUG
+      print *,taskid,threadid,": Exiting pack_fcomm2_trans"
+!$OMP FLUSH
+#endif
+      return
       end subroutine
 
-      subroutine unpack_fcomm2_trans(dest,recvbuf,buf3,j,nv,op)
+!------------------------------------------------------------
+      subroutine unpack_fcomm2_trans(dest,recvbuf,op)
 
       use fft_spec
       implicit none
@@ -168,11 +237,11 @@
       complex(mytype) dest(nzc,jjsize,iisize)
       complex(mytype) buf3(nz_fft,jjsize)
 #ifdef USE_EVEN
-      complex(mytype) recvbuf(KfCntMax*nv*jproc/(mytype*2))
+      complex(mytype) recvbuf(KfCntMax)
 #else
-      complex(mytype) recvbuf(nzc*jjsize*iisize*nv)
+      complex(mytype) recvbuf(nzc*jjsize*iisize)
 #endif
-      integer x,z,y,i,ierr,xs,ys,y2,z2,iy,iz,ix,x2,n,sz,l,dny,dnz,nv,j,nz,dim_out
+      integer x,z,y,i,ierr,xs,ys,y2,z2,iy,iz,ix,x2,n,sz,l,dny,dnz,nz,dim_out
       integer(i8) position,pos1,pos0,pos2
       character(len=3) op
 
@@ -189,9 +258,9 @@
          do i=0,jproc-1
 
 #ifdef USE_EVEN
- 	      pos1 = pos0 + (i * nv + j-1) * KfCntMax / (mytype*2) 
+ 	      pos1 = pos0 + i  * KfCntMax / (mytype*2) 
 #else
- 	      pos1 = pos0 + nv * KfRcvStrt(i) / (mytype*2) + (j-1)*iisize*jjsize*kjsz(i) 
+ 	      pos1 = pos0 + KfRcvStrt(i) / (mytype*2) 
 #endif
 
            if(kjen(i) .lt. nzhc .or. kjst(i) .gt. nzhc+1) then
@@ -241,9 +310,9 @@
 
 	      pos0 = pos0 + iisize*jjsize*dnz
 #ifdef USE_EVEN
- 	      pos1 = pos0 + (i * nv + j-1) * KfCntMax / (mytype*2) 
+ 	      pos1 = pos0 + i * KfCntMax / (mytype*2) 
 #else
- 	      pos1 = pos0 + nv * KfRcvStrt(i) / (mytype*2) + (j-1)*iisize*jjsize*kjsz(i) 
+ 	      pos1 = pos0 + KfRcvStrt(i) / (mytype*2) 
 #endif
 
 	      do z=nzhc+1,kjen(i),NBz
@@ -278,9 +347,9 @@
          do i=0,jproc-1
 
 #ifdef USE_EVEN
-            pos0 = (i * nv +j-1) *KfCntMax / (mytype*2) + (x-1)*jjsize 
+            pos0 = i  *KfCntMax / (mytype*2) + (x-1)*jjsize 
 #else         
-	    pos0 = nv * KfRcvStrt(i) / (mytype*2) + (x-1)*jjsize+ (j-1)*iisize*jjsize*kjsz(i)
+	    pos0 = KfRcvStrt(i) / (mytype*2) + (x-1)*jjsize
 #endif 
 
             do z=kjst(i),kjen(i),NBz
@@ -339,9 +408,9 @@
          do i=0,jproc-1
 
 #ifdef USE_EVEN
-            pos0 = (i * nv +j-1)*KfCntMax / (mytype*2) + (x-1)*jjsize 
+            pos0 = i *KfCntMax / (mytype*2) + (x-1)*jjsize 
 #else         
-	   pos0 = nv * KfRcvStrt(i) / (mytype*2) + (x-1)*jjsize + (j-1)*iisize*jjsize*kjsz(i)
+	   pos0 = KfRcvStrt(i) / (mytype*2) + (x-1)*jjsize
 #endif 
 
             do z=kjst(i),kjen(i),NBz
@@ -374,9 +443,9 @@
          do i=0,jproc-1
 
 #ifdef USE_EVEN
-            pos0 = (i * nv +j-1)*KfCntMax / (mytype*2) + (x-1)*jjsize 
+            pos0 = i *KfCntMax / (mytype*2) + (x-1)*jjsize 
 #else         
-	   pos0 = nv * KfRcvStrt(i) / (mytype*2) + (x-1)*jjsize+ (j-1)*iisize*jjsize*kjsz(i)
+	   pos0 = KfRcvStrt(i) / (mytype*2) + (x-1)*jjsize
 #endif 
 
             do z=kjst(i),kjen(i),NBz
@@ -418,110 +487,6 @@
       enddo
 
       endif
-      endif
-
-      return
-      end subroutine
-
-      subroutine fcomm2_trans(source,dest,buf3,op,t,tc)
-!========================================================
-
-      use fft_spec
-      implicit none
-
-! Assume stride1
-      complex(mytype) source(ny_fft,iisize,kjsize)
-      complex(mytype) dest(nzc,jjsize,iisize)
-      complex(mytype) buf3(nz_fft,jjsize)
-
-      real(r8) t,tc
-      integer x,z,y,i,ierr,xs,ys,y2,z2,iy,iz,ix,x2,n,sz,l,dny,dnz
-      integer(i8) position,pos1,pos0
-      character(len=3) op
-
-
-! Pack send buffers for exchanging y and z for all x at once 
-
-      dny = ny_fft-nyc
-
-      tc = tc - MPI_Wtime()
-
-      do i=0,jproc-1
-#ifdef USE_EVEN
-         pos0 = i*KfCntMax/(mytype*2)  + 1 
-#else
-         pos0 = KfSndStrt(i)/(mytype*2)+ 1 
-#endif
-
-! Pack the sendbuf, omitting the center ny-nyc elements in Y dimension
-
-! If clearly in the first half of ny
-
-         if(jjen(i) .le. nyhc) then
-     	    do z=1,kjsize
-               position = pos0 +(z-1)*jjsz(i)*iisize
-               do x=1,iisize
-                  do y=jjst(i),jjen(i)
-                     buf1(position) = source(y,x,z)
-                     position = position+1
-                  enddo
-               enddo	
-            enddo
-
-! If clearly in the second half of ny
-         else if (jjst(i) .ge. nyhc+1) then
-     	    do z=1,kjsize
-               position = pos0 +(z-1)*jjsz(i)*iisize
-               do x=1,iisize
-                  do y=jjst(i)+dny,jjen(i)+dny
-                     buf1(position) = source(y,x,z)
-                     position = position+1
-                  enddo
-               enddo	
-            enddo
-
-
-
-! If spanning the first and second half of ny (e.g. iproc is odd)
-         else
-     	    do z=1,kjsize
-               position = pos0 +(z-1)*jjsz(i)*iisize
-               do x=1,iisize
-                  do y=jjst(i),nyhc
-                     buf1(position) = source(y,x,z)
-                     position = position+1
-                  enddo
-                  do y=ny_fft-nyhc+1,jjen(i)+dny
-                     buf1(position) = source(y,x,z)
-                     position = position+1
-                  enddo
-               enddo	
-            enddo
-         endif
-
-      enddo
-
-
-      tc = tc + MPI_Wtime()
-      t = t - MPI_Wtime()
-
-#ifdef USE_EVEN
-      call mpi_alltoall(buf1,KfCntMax, mpi_byte, buf2,KfCntMax, mpi_byte,mpi_comm_col,ierr)
-#else      
-! Exchange y-z buffers in columns of processors
-
-      call mpi_alltoallv(buf1,KfSndCnts, KfSndStrt,mpi_byte,buf2,KfRcvCnts, KfRcvStrt,mpi_byte,mpi_comm_col,ierr)
-#endif
-
-      t = MPI_Wtime() + t
-
-     if(jjsize .gt. 0) then
-
-      tc = - MPI_Wtime() + tc
-
-         call unpack_fcomm2_trans(dest,buf2,buf3,1,1,op)
-
-      t = MPI_Wtime() + t
       endif
 
       return

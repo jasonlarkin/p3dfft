@@ -2,25 +2,22 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* overriding mpicc to link C programs (only for IBM) */
-/* #undef CC */
+#define CC "mpfort"
 
 /* arguments passed to configure script */
-#define CONFIGURE_ARGS " '--enable-fftw' '--enable-intel' '--enable-stride1' '--with-fftw=/opt/fftw/3.3.3/intel/mvapich2/ib' 'FC=mpif90' 'CC=mpicc'"
-
-/* Define if you want to compile P3DFFT using CRAY compiler */
-/* #undef CRAY */
+#define CONFIGURE_ARGS " '--enable-ibm' '--enable-stride1' '--enable-essl' 'FC=mpixlf2003_r' 'FCFLAGS=-O3 -qsmp=omp' 'LDFLAGS=-L/soft/libraries/essl/current/lib64' 'LIBS=-lesslbg'"
 
 /* Define if you want to enable C convention for processor dimensions */
 /* #undef DIMS_C */
 
 /* Define if you want to use the ESSL library instead of FFTW */
-/* #undef ESSL */
+#define ESSL 1
 
 /* Define whether you want to enable estimation */
 /* #undef ESTIMATE */
 
 /* Define if you want to use the FFTW library */
-#define FFTW 1
+/* #undef FFTW */
 
 /* Define if you want to compile P3DFFT using GNU compiler */
 /* #undef GNU */
@@ -57,10 +54,10 @@
 #define HAVE_UNISTD_H 1
 
 /* Define if you want to compile P3DFFT using IBM compiler */
-/* #undef IBM */
+#define IBM 1
 
 /* Define if you want to compile P3DFFT using Intel compiler */
-#define INTEL 1
+/* #undef INTEL */
 
 /* Define if you want to enable the measure algorithm */
 #define MEASURE 1

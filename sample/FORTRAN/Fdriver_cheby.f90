@@ -17,7 +17,7 @@
 ! To build this program, use one of the provided makefiles, modifying
 ! it as needed for your compilers, flags and library locations.
 ! Be sure to link the program with both the P3DFFT library and the underlying
-! 1D FFT library such as ESSL or FFTW.
+! 1D FFT library such as 1 or FFTW.
 !
 ! If you have questions please contact Dmitry Pekurovsky, dmitry@sdsc.edu
 
@@ -99,11 +99,7 @@
       	enddo
       	allocate(coordZ(nz))
       	do k=1,nz
-#ifndef SINGLE_PREC
       		coordZ(k) = dcos( pi*(k-1)/dble(nz-1) ) *2.d0/Lz
-#else
-      		coordZ(k) = scos( pi*(k-1)/dble(nz-1) ) *2.d0/Lz
-#endif
       	enddo
       	if(mod(nz,2) .eq. 0) then
       		if(proc_id .eq. 0) write(*,*) 'ERROR: Chebyshev expects nz to be odd!'
@@ -216,11 +212,7 @@
       	integer            :: i,j,k,ierr
 
       	do k=istart(3),iend(3)
-#ifndef SINGLE_PREC
            rmem(:,:,k) = dsin(coordZ(k))
-#else
-           rmem(:,:,k) = ssin(coordZ(k))
-#endif
         enddo
 
          call MPI_Barrier(MPI_COMM_WORLD,ierr)
@@ -235,7 +227,6 @@
         endif
         call print_buf(cmem,fsize(1),fsize(2),fsize(3))
 
-#ifdef STRIDE1
 
         do i=fstart(3),fend(3)
            do j=fstart(2),fend(2)
@@ -243,14 +234,6 @@
               cmem(nz,j,i) = cmem(nz,j,i) * 2.0d0
            enddo
         enddo
-#else
-        do j=fstart(2),fend(2)
-           do i=fstart(1),fend(1)
-              cmem(i,j,1) = cmem(i,j,1) * 2.0d0
-              cmem(i,j,nz) = cmem(i,j,nz) * 2.0d0
-           enddo
-        enddo
-#endif
         cmem = cmem * 0.5d0
 
       	call p3dfft_btran_c2r(cmem, rmem,'cff')
@@ -259,11 +242,7 @@
         do k=istart(3),iend(3)
       	  do j=istart(2),iend(2)
              do i=istart(1),iend(1)
-#ifndef SINGLE_PREC
      		  delta = rmem(i,j,k) -dcos(coordZ(k))
-#else
-     		  delta = rmem(i,j,k) -scos(coordZ(k))
-#endif
      		  if(abs(delta) .gt. maxdelta1) maxdelta1 = abs(delta)
      		enddo
      	  enddo

@@ -4,8 +4,8 @@
 !
 !    Software Framework for Scalable Fourier Transforms in Three Dimensions
 !
-!    Copyright (C) 2006-2014 Dmitry Pekurovsky
-!    Copyright (C) 2006-2014 University of California
+!    Copyright (C) 2006-2010 Dmitry Pekurovsky
+!    Copyright (C) 2006-2010 University of California
 !    Copyright (C) 2010-2011 Jens Henrik Goebbert
 !
 !    This program is free software: you can redistribute it and/or modify
@@ -41,13 +41,15 @@
       integer rcvcnts(0:jproc-1)
       integer sndstrt(0:jproc-1)
       integer rcvstrt(0:jproc-1)
+      complex(mytype) buf1(buf_size,nv), buf2(buf_size*nv)
+
       
       
 !     Pack the data for sending
 
       tc = tc - MPI_Wtime()
       do j=1,nv
-	 call pack_bcomm1(source(1,j),j,nv)
+	 call pack_bcomm1(source(1,j),buf1(1,j),j,nv)
       enddo
       tc = tc + MPI_Wtime()
 
@@ -71,19 +73,6 @@
       t = t + MPI_Wtime() 
 
 ! Unpack receive buffers into dest
-      
-      call unpack_bcomm1_many(dest,buf2,nv)
-      
-      return
-      end subroutine
-
-!========================================================
-      subroutine unpack_bcomm1_many(dest,buf2,nv)
-!========================================================
-
-      complex(mytype) dest(iisize,ny_fft,kjsize,nv)
-      complex(mytype) buf2(iisize*ny_fft*kjsize*nv)
-      integer i,j,position,pos0,pos1,x,y,z,dny,nv
 
       position=1
       dny = ny_fft - nyc
@@ -149,13 +138,12 @@
          position = (i+1)*KfCntMax*nv/(mytype*2)+1
 #endif
       enddo
+      
+      
+      return
+      end subroutine
 
-      end subroutine      
-
-
-!========================================================
-      subroutine pack_bcomm1(A,j,nv)
-!========================================================
+      subroutine pack_bcomm1(A,sendbuf,j,nv)
 
       integer j,nv
       complex(mytype) A(iisize,jjsize,nz_fft)
@@ -165,7 +153,8 @@
       integer rcvcnts(0:jproc-1)
       integer sndstrt(0:jproc-1)
       integer rcvstrt(0:jproc-1)
-
+      complex(mytype) sendbuf(buf_size*nv)
+      
       do i=0,jproc-1
 #ifdef USE_EVEN
          position = i*KfCntMax*nv/(mytype*2)+1
@@ -177,7 +166,7 @@
          do z=kjst(i),kjen(i)
             do y=1,jjsize
                do x=1,iisize
-                  buf1(position) = A(x,y,z)
+                  sendbuf(position) = A(x,y,z)
                   position = position+1
                enddo
             enddo
@@ -187,7 +176,6 @@
       return
       end subroutine
 
-!========================================================
       subroutine bcomm1 (source,dest,t,tc)
 !========================================================
       implicit none
@@ -197,13 +185,19 @@
       real(r8) t,tc
       integer x,y,z,i,ierr,xs,ys,iy,iz,y2,z2,dny
       integer(i8) position,pos1
+      complex(mytype), allocatable :: buf1(:),buf2(:)
       
 !     Pack the data for sending
+
+
+     allocate(buf2(buf_size))
 
 #ifdef USE_EVEN
 
       if(KfCntUneven) then
          tc = tc - MPI_Wtime()
+         allocate(buf1(buf_size))
+
          position = 1
          do i=0,jproc-1
             do z=kjst(i),kjen(i)
@@ -219,37 +213,34 @@
          tc = tc + MPI_Wtime()
   
          t = t - MPI_Wtime() 
+!$OMP ordered
          call mpi_alltoall(buf1,KfCntMax,mpi_byte, &
               buf2,KfCntMax,mpi_byte,mpi_comm_col,ierr)
+!$OMP end ordered
                   
+         deallocate(buf1)
       else
          t = t - MPI_Wtime() 
+!$OMP ordered
          call mpi_alltoall(source,KfCntMax,mpi_byte, &
               buf2,KfCntMax,mpi_byte,mpi_comm_col,ierr)
+!$OMP end ordered
       endif
 #else      
  
 !     Exchange data in columns
       t = t - MPI_Wtime() 
+!$OMP ordered
       call mpi_alltoallv(source,JrSndCnts, JrSndStrt,mpi_byte, &
            buf2,JrRcvCnts, JrRcvStrt,mpi_byte,mpi_comm_col,ierr)
+!$OMP end ordered
 #endif      
 
 
       t = t + MPI_Wtime() 
 
 ! Unpack receive buffers into dest
-
-      call unpack_bcomm1(dest,buf2)
-
-      return
-      end subroutine
-
-      subroutine unpack_bcomm1(dest,buf2)
-
-      complex(mytype) dest(iisize,ny_fft,kjsize)
-      complex(mytype) buf2(iisize*ny_fft*kjsize)
-      integer i,position,pos0,x,y,z,dny
+ 
 
       position=1
       dny = ny_fft - nyc
@@ -306,7 +297,9 @@
          position = (i+1)*KfCntMax/(mytype*2)+1
 #endif
       enddo
-      
+
+      deallocate(buf2)
+
       
       return
       end subroutine

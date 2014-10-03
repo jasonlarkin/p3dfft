@@ -39,16 +39,6 @@
       integer stride_x1,stride_x2,stride_y1,stride_y2,N,m,fflag
       complex(mytype) X(N*m),Y(N*m)
 
-#ifdef FFTW
-
-#ifndef SINGLE_PREC
-      call dfftw_plan_many_dft(plan1_bc,1,N,m,X,NULL,stride_x1,stride_x2, &
-           Y,NULL,stride_y1,stride_y2, FFTW_BACKWARD,fftw_flag)
-#else
-      call sfftw_plan_many_dft(plan1_bc,1,N,m,X,NULL,stride_x1,stride_x2, &
-           Y,NULL,stride_y1,stride_y2, FFTW_BACKWARD,fftw_flag)
-#endif
-#endif
       return
       end
 
@@ -62,16 +52,6 @@
       integer stride_x1,stride_x2,stride_y1,stride_y2,N,m,fflag
       complex(mytype) X(N*m),Y(N*m)
 
-#ifdef FFTW
-
-#ifndef SINGLE_PREC
-      call dfftw_plan_many_dft(plan2_bc_same,1,N,m,X,NULL,stride_x1,stride_x2, &
-           Y,NULL,stride_y1,stride_y2, FFTW_BACKWARD,fftw_flag) 
-#else
-      call sfftw_plan_many_dft(plan2_bc_same,1,N,m,X,NULL,stride_x1,stride_x2, &
-           Y,NULL,stride_y1,stride_y2, FFTW_BACKWARD,fftw_flag )
-#endif
-#endif
       return
       end
 
@@ -85,16 +65,6 @@
       integer stride_x1,stride_x2,stride_y1,stride_y2,N,m,fflag
       complex(mytype) X(N*m),Y(N*m)
 
-#ifdef FFTW
-
-#ifndef SINGLE_PREC
-      call dfftw_plan_many_dft(plan2_bc_dif,1,N,m,X,NULL,stride_x1,stride_x2, &
-           Y,NULL,stride_y1,stride_y2, FFTW_BACKWARD,fftw_flag) 
-#else
-      call sfftw_plan_many_dft(plan2_bc_dif,1,N,m,X,NULL,stride_x1,stride_x2, &
-           Y,NULL,stride_y1,stride_y2, FFTW_BACKWARD,fftw_flag )
-#endif
-#endif
       return
       end
 
@@ -117,7 +87,6 @@
 
       nm2 = (N-1) * 2
 
-#ifndef SINGLE_PREC
 	if(op == 't' .or. op == 'f') then
             call dcft(1,X,stride_x1,stride_x2,Y,stride_y1,stride_y2,N,m,& 
               -1,1.0d0, caux1(1,mythread),cnaux,caux2(1,mythread),cnaux)
@@ -133,23 +102,6 @@
 	   print *,taskid,'Unknown transform type: ',op
 	   call MPI_abort(MPI_COMM_WORLD,errorcode,ierr)
 	endif
-#else
-	if(op == 't' .or. op == 'f') then
-            call scft(1,X,stride_x1,stride_x2,Y,stride_y1,stride_y2,N,m,-1,1.0, &
-                 caux1(1,mythread),cnaux,caux2(1,mythread),cnaux)
-	else if(op == 'c') then	
-            call scosf (1, X, stride_x1, stride_x2, &
-                 Y, stride_y1, stride_y2, nm2, m, 2.0d0, &
-		 caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
-	else if(op == 's') then	
-            call ssinf (1, X, stride_x1, stride_x2, &
-                 Y, stride_y1, stride_y2, nm2, m, 2.0d0, &
-                 caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
- 	else
-	   print *,taskid,'Unknown transform type: ',op
-	   call MPI_abort(MPI_COMM_WORLD,errorcode,ierr)
-	endif
-#endif
       return
       end
 
@@ -167,16 +119,6 @@
       complex(mytype) X((N/2+1)*m)
       real(mytype) Y(N*m)
 
-#ifdef FFTW
-
-#ifndef SINGLE_PREC
-      call dfftw_plan_many_dft_c2r(plan1_bcr,1,N,m, &
-              X,NULL,1,dimx, Y,NULL,1,dimy,fftw_flag)
-#else
-      call sfftw_plan_many_dft_c2r(plan1_bcr,1,N,m, &
-              X,NULL,1,dimx, Y,NULL,1,dimy,fftw_flag)
-#endif
-#endif
 
       return
       end
@@ -191,19 +133,12 @@
       complex(mytype) X((N/2+1)*m)
       real(mytype) Y(N*m)
 
-#ifdef ESSL
 
       integer mythread, OMP_GET_THREAD_NUM
       mythread = OMP_GET_THREAD_NUM()
 
-#ifndef SINGLE_PREC
       call dcrft(1,X,dimx,Y,dimy,N,m,-1,1.0d0, &
             raux1(1,mythread), rnaux1,raux2(1,mythread),rnaux2,raux3,1)  
-#else
-      call scrft(1,X,dimx,Y,dimy,N,m,-1,1.0, &
-            raux1(1,mythread), rnaux1,raux2(1,mythread),rnaux2,raux3,1)  
-#endif
-#endif
 
       return
       end
@@ -220,18 +155,6 @@
       integer N,m,stride_x1,stride_x2,stride_y1,stride_y2,fflag
       complex(mytype) X(N*m),Y(N*m)
 
-#ifdef FFTW
-
-      fflag = fftw_flag 
-
-#ifndef SINGLE_PREC
-      call dfftw_plan_many_dft(plan1_fc,1,N,m, X,NULL,stride_x1,stride_x2, &
-        Y,NULL,stride_y1,stride_y2,FFTW_FORWARD,fflag)
-#else
-      call sfftw_plan_many_dft(plan1_fc,1,N,m, X,NULL,stride_x1,stride_x2, &
-        Y,NULL,stride_y1,stride_y2,FFTW_FORWARD,fflag)
-#endif
-#endif
       return
       end
 
@@ -245,18 +168,6 @@
       integer N,m,stride_x1,stride_x2,stride_y1,stride_y2,fflag
       complex(mytype) X(N*m),Y(N*m)
 
-#ifdef FFTW
-
-      fflag = fftw_flag
-
-#ifndef SINGLE_PREC
-      call dfftw_plan_many_dft(plan2_fc_same,1,N,m, X,NULL,stride_x1,stride_x2, &
-        Y,NULL,stride_y1,stride_y2,FFTW_FORWARD,fflag)
-#else
-      call sfftw_plan_many_dft(plan2_fc_same,1,N,m, X,NULL,stride_x1,stride_x2, &
-        Y,NULL,stride_y1,stride_y2,FFTW_FORWARD,fflag)
-#endif
-#endif
       return
       end
 
@@ -269,18 +180,6 @@
       integer N,m,stride_x1,stride_x2,stride_y1,stride_y2,fflag
       complex(mytype) X(N*m),Y(N*m)
 
-#ifdef FFTW
-
-      fflag = fftw_flag
-
-#ifndef SINGLE_PREC
-      call dfftw_plan_many_dft(plan2_fc_dif,1,N,m, X,NULL,stride_x1,stride_x2, &
-        Y,NULL,stride_y1,stride_y2,FFTW_FORWARD,fflag)
-#else
-      call sfftw_plan_many_dft(plan2_fc_dif,1,N,m, X,NULL,stride_x1,stride_x2, &
-        Y,NULL,stride_y1,stride_y2,FFTW_FORWARD,fflag)
-#endif
-#endif
       return
       end
 
@@ -299,12 +198,8 @@
       integer mythread, OMP_GET_THREAD_NUM,nm2,ierr,errorcode
       mythread = OMP_GET_THREAD_NUM()
 
-#ifdef DEBUG
-      print *,taskid,': Initializing dcft', stride_x1,stride_x2,stride_y1,stride_y2,N,m,cnaux
-#endif
       nm2 = (N-1) * 2
 
-#ifndef SINGLE_PREC
 	if(op == 't' .or. op == 'f') then
             call dcft(1,X,stride_x1,stride_x2,Y,stride_y1,stride_y2,N,m,1,1.0d0, &
                  caux1(1,mythread),cnaux,caux2(1,mythread),cnaux)
@@ -320,23 +215,6 @@
 	   print *,taskid,'Unknown transform type: ',op
 	   call MPI_abort(MPI_COMM_WORLD,errorcode,ierr)
 	endif
-#else
-	if(op == 't' .or. op == 'f') then
-            call scft(1,X,stride_x1,stride_x2,Y,stride_y1,stride_y2,N,m,1,1.0, &
-                 caux1(1,mythread),cnaux,caux2(1,mythread),cnaux)
-	else if(op == 'c') then	
-            call scosf (1, X, stride_x1, stride_x2, &
-                 Y, stride_y1, stride_y2, nm2, m, 2.0d0, &
-		 caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
-	else if(op == 's') then	
-            call ssinf (1, X, stride_x1, stride_x2, &
-                 Y, stride_y1, stride_y2, nm2, m, 2.0d0, &
-                 caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
- 	else
-	   print *,taskid,'Unknown transform type: ',op
-	   call MPI_abort(MPI_COMM_WORLD,errorcode,ierr)
-	endif
-#endif
 
       return
       end
@@ -354,16 +232,6 @@
       real(mytype) X(N*m)
       complex(mytype) Y((N/2+1)*m)
 
-#ifdef FFTW
-
-#ifndef SINGLE_PREC
-      call dfftw_plan_many_dft_r2c(plan1_frc,1,N,m, &
-           X,NULL,1,dimx, Y,NULL,1,dimy,fftw_flag)
-#else
-      call sfftw_plan_many_dft_r2c(plan1_frc,1,N,m, &
-           X,NULL,1,dimx, Y,NULL,1,dimy,fftw_flag)
-#endif
-#endif
 
       return
       end
@@ -377,26 +245,19 @@
       real(mytype) X(N*m)
       complex(mytype) Y((N/2+1)*m)
 
-#ifdef ESSL
       integer mythread, OMP_GET_THREAD_NUM
       mythread = OMP_GET_THREAD_NUM()
 
-#ifndef SINGLE_PREC
       call drcft(1,X,dimx,Y,dimy,N,m,1,1.0d0, &
             raux1(1,mythread), rnaux1,raux2(1,mythread),rnaux2,raux3,1)           
-#else
-      call srcft(1,X,dimx,Y,dimy,N,m,1,1.0, &
-            raux1(1,mythread), rnaux1,raux2(1,mythread),rnaux2,raux3,1)           
-#endif
 
-#endif
 
       return
       end
 
 !!--------------------------------------------------------------
 ! One-time initialization
-! Initialize work arrays for ESSL
+! Initialize work arrays for 1
 
       subroutine init_work(nx,ny,nz)
       
@@ -404,9 +265,7 @@
       use p3dfft
       integer nx,ny,nz,err
 
-#ifdef ESSL
 
-#ifndef SINGLE_PREC
       integer nyz
       nyz = max(ny,nz)
       if(nyz .le. 2048) then
@@ -424,28 +283,8 @@
          rnaux1 = 20000+1.64*nx
          rnaux2=20000+1.14*nx
       endif
-#else
-      integer nyz
-      nyz = max(ny,nz)
-      if(nyz .le. 8192) then
-         cnaux = 20000
-      else 
-         cnaux = 20000+1.14*nyz
-      endif
-      if(nyz .ge. 252) then
-         cnaux = cnaux +(nyz+256)*64
-      endif
 
-      if(nx .le. 16384) then
-         rnaux1 = 25000
-         rnaux2 = 20000
-      else
-         rnaux1 = 20000+0.82*nx
-         rnaux2=20000+0.57*nx
-      endif
-#endif
-
-!	print *,'Allocating aux arrays; nthreads=',nthreads
+	print *,'Allocating aux arrays; nthreads=',nthreads
       allocate(caux1(cnaux,nthreads),stat=err)
       if(err .ne. 0) then
          print *,'Error allocating caux1'
@@ -463,7 +302,6 @@
          print *,'Error allocating raux2'
       endif
 
-#endif
 
       return
       end
@@ -474,13 +312,6 @@
       subroutine clean_x1
 
       use fft_spec
-#ifdef FFTW
-#ifndef SINGLE_PREC
-      call dfftw_destroy_plan(plan1)      
-#else
-      call sfftw_destroy_plan(plan1)      
-#endif
-#endif
       
       return
       end
@@ -491,13 +322,6 @@
 
       use fft_spec
 
-#ifdef FFTW
-#ifndef SINGLE_PREC
-      call dfftw_destroy_plan(plan2)      
-#else
-      call sfftw_destroy_plan(plan2)      
-#endif
-#endif
       
       return
       end
@@ -506,31 +330,21 @@
 
       subroutine clean_x3
 
-#ifdef FFTW
-      use fft_spec
-#ifndef SINGLE_PREC
-      call dfftw_destroy_plan(plan3)      
-#else
-      call sfftw_destroy_plan(plan3)      
-#endif
-#endif
       
       return
       end
 
 !!--------------------------------------------------------------
-! Release work arrays for ESSL
+! Release work arrays for 1
 
       subroutine free_work
       
       use fft_spec
 
-#ifdef ESSL
       deallocate(caux1)      
       deallocate(caux2)
       deallocate(raux1)
       deallocate(raux2)
-#endif
 
       return
       end
@@ -549,19 +363,11 @@ subroutine init_ctrans_r2 (X, stride_x1, stride_x2, Y, stride_y1, stride_y2, N, 
     real (mytype) :: X (N*m), Y (N*m)
     integer :: nm2
  
-#ifdef ESSL
     nm2 = (N-1) * 2
-#ifndef SINGLE_PREC
     call dcosf (1, X, stride_x1, stride_x2, &
                    Y, stride_y1, stride_y2, &
                    nm2, m, 2.0d0, caux1, cnaux, caux2, cnaux)
-#else
-    call scosf (1, X, stride_x1, stride_x2, &
-                   Y, stride_y1, stride_y2, &
-                   nm2, m, 2.0, caux1, cnaux, caux2, cnaux)
-#endif
  
-#endif
  
     return
 end
@@ -580,18 +386,6 @@ subroutine plan_ctrans_r2_same (X, stride_x1, stride_x2, Y, stride_y1, stride_y2
     integer :: stride_x1, stride_x2, stride_y1, stride_y2, N, m
     real (mytype) :: X (N*m), Y (N*m)
  
-#ifdef FFTW
- 
-#ifndef SINGLE_PREC
-    call dfftw_plan_many_r2r (plan_ctrans_same, 1, N, m, &
-                              X, NULL, stride_x1, stride_x2, &
-                              Y, NULL, stride_y1, stride_y2, FFTW_REDFT00, fftw_flag)
-#else
-    call sfftw_plan_many_r2r (plan_ctrans_same, 1, N, m, &
-                              X, NULL, stride_x1, stride_x2, &
-                              Y, NULL, stride_y1, stride_y2, FFTW_REDFT00, fftw_flag)
-#endif
-#endif
     return
 end
 
@@ -603,18 +397,6 @@ subroutine plan_ctrans_r2_dif (X, stride_x1, stride_x2, Y, stride_y1, stride_y2,
     integer :: stride_x1, stride_x2, stride_y1, stride_y2, N, m
     real (mytype) :: X (N*m), Y (N*m)
  
-#ifdef FFTW
- 
-#ifndef SINGLE_PREC
-    call dfftw_plan_many_r2r (plan_ctrans_dif, 1, N, m, &
-                              X, NULL, stride_x1, stride_x2, &
-                              Y, NULL, stride_y1, stride_y2, FFTW_REDFT00, fftw_flag)
-#else
-    call sfftw_plan_many_r2r (plan_ctrans_dif, 1, N, m, &
-                              X, NULL, stride_x1, stride_x2, &
-                              Y, NULL, stride_y1, stride_y2, FFTW_REDFT00, fftw_flag)
-#endif
-#endif
     return
 end
 
@@ -632,19 +414,11 @@ subroutine init_strans_r2 (X, stride_x1, stride_x2, Y, stride_y1, stride_y2, N, 
     real (mytype) :: X (N*m), Y (N*m)
     integer :: nm2
  
-#ifdef ESSL
     nm2 = (N-1) * 2
-#ifndef SINGLE_PREC
     call dsinf (1, X, stride_x1, stride_x2, &
                    Y, stride_y1, stride_y2, &
                    nm2, m, 2.0d0, caux1, cnaux, caux2, cnaux)
-#else
-    call ssinf (1, X, stride_x1, stride_x2, &
-                   Y, stride_y1, stride_y2, &
-                   nm2, m, 2.0, caux1, cnaux, caux2, cnaux)
-#endif
  
-#endif
  
     return
 end
@@ -662,19 +436,6 @@ subroutine plan_strans_r2_same (X, stride_x1, stride_x2, Y, stride_y1, stride_y2
     integer :: stride_x1, stride_x2, stride_y1, stride_y2, N, m
     real (mytype) :: X (N*m), Y (N*m)
  
-#ifdef FFTW
- 
-#ifndef SINGLE_PREC
-!! ccccccc http://www.fftw.org/doc/1d-Real_002dodd-DFTs-_0028DSTs_0029.html
-    call dfftw_plan_many_r2r (plan_strans_same, 1, N, m, &
-                              X, NULL, stride_x1, stride_x2, &
-                              Y, NULL, stride_y1, stride_y2, FFTW_RODFT00, fftw_flag)
-#else
-    call sfftw_plan_many_r2r (plan_strans_same, 1, N, m, &
-                              X, NULL, stride_x1, stride_x2, &
-                              Y, NULL, stride_y1, stride_y2, FFTW_RODFT00, fftw_flag)
-#endif
-#endif
     return
 end
 
@@ -686,18 +447,5 @@ subroutine plan_strans_r2_dif (X, stride_x1, stride_x2, Y, stride_y1, stride_y2,
     integer :: stride_x1, stride_x2, stride_y1, stride_y2, N, m
     real (mytype) :: X (N*m), Y (N*m)
  
-#ifdef FFTW
- 
-#ifndef SINGLE_PREC
-!! ccccccc http://www.fftw.org/doc/1d-Real_002dodd-DFTs-_0028DSTs_0029.html
-    call dfftw_plan_many_r2r (plan_strans_dif, 1, N, m, &
-                              X, NULL, stride_x1, stride_x2, &
-                              Y, NULL, stride_y1, stride_y2, FFTW_RODFT00, fftw_flag)
-#else
-    call sfftw_plan_many_r2r (plan_strans_dif, 1, N, m, &
-                              X, NULL, stride_x1, stride_x2, &
-                              Y, NULL, stride_y1, stride_y2, FFTW_RODFT00, fftw_flag)
-#endif
-#endif
     return
 end

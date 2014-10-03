@@ -4,8 +4,8 @@
 !
 !    Software Framework for Scalable Fourier Transforms in Three Dimensions
 !
-!    Copyright (C) 2006-2014 Dmitry Pekurovsky
-!    Copyright (C) 2006-2014 University of California
+!    Copyright (C) 2006-2010 Dmitry Pekurovsky
+!    Copyright (C) 2006-2010 University of California
 !    Copyright (C) 2010-2011 Jens Henrik Goebbert
 !
 !    This program is free software: you can redistribute it and/or modify
@@ -24,16 +24,10 @@
 !
 !----------------------------------------------------------------------------
 
-! This file contains routines for transposing data locally in memory
-! They are used then either iproc=1 or jproc=1 (or both)
-
-
 ! This routine is called only when jproc=1, and only when stride1 is used
 ! transform backward in Z and transpose array in memory 
 
-!=============================================================
-      subroutine reorder_trans_b1_many(A,B,C,dim,nv,op)
-!=============================================================
+      subroutine reorder_trans_b1_many(A,B,dim,nv,op)
 
       use fft_spec
 
@@ -41,23 +35,132 @@
       integer x,y,z,iy,iz,y2,z2,ierr,dnz,dny,nv,j,dim
       complex(mytype) A(dim,nv)
       complex(mytype) B(ny_fft,iisize,nz_fft,nv)
-      complex(mytype) C(nz_fft,nyc)
+!      complex(mytype) C(nz_fft,nyc)
 
       do j=1,nv
-         call reorder_trans_b1(A(1,j),B(1,1,1,j),C,op)
+         call reorder_trans_b1(A(1,j),B(1,1,1,j),op)
       enddo
 
       return
       end subroutine
 
-!=============================================================
-      subroutine reorder_trans_b1(A,B,C,op)
-!=============================================================
+
+! This routine is called only when iproc=1, and only when stride1 is used
+! Transpose array in memory and transform forward in Y
+
+      subroutine reorder_b2_many(A,B,nv)
+
+      implicit none
+
+      complex(mytype) B(nxhp,ny_fft,kjsize,nv)
+      complex(mytype) A(ny_fft,nxhpc,kjsize,nv)
+      integer x,y,z,iy,x2,ix,y2,nv,j
+      complex(mytype), allocatable :: tmp(:,:)
+
+
+      allocate(tmp(nxhpc,ny_fft))
+
+      do j=1,nv
+      do z=1,kjsize
+         do x=1,nxhpc,nbx
+            x2 = min(x+nbx-1,nxhpc)
+            do y=1,ny_fft,nby1
+               y2 = min(y+nby1-1,ny_fft)
+               do ix=x,x2
+                  do iy = y,y2
+                     tmp(ix,iy) = A(iy,ix,z,j)
+                  enddo
+               enddo
+            enddo
+         enddo
+
+         do y=1,ny_fft
+            do x=1,nxhpc
+               B(x,y,z,j) = tmp(x,y)
+            enddo
+	    do x=nxhpc+1,nxhp
+	       B(x,y,z,j) = 0.
+	    enddo
+         enddo
+      enddo
+      enddo
+
+      deallocate(tmp)
+
+      return
+      end subroutine
+
+! This routine is called only when iproc=1, and only when stride1 is used
+! Transpose array in memory and transform forward in Y
+
+      subroutine reorder_f1_many(A,B,tmp,nv)
+
+      implicit none
+
+      complex(mytype) A(nxhp,ny_fft,kjsize,nv)
+      complex(mytype) B(ny_fft,nxhpc,kjsize,nv)
+      integer x,y,z,iy,x2,ix,y2,dnx,nv,j
+      complex(mytype) tmp(ny_fft,nxhpc,kjsize)
+!      complex(mytype), allocatable :: tmp(:,:)
+
+!      allocate(tmp(ny_fft,nxhpc))
+
+       do j=1,nv
+      do z=1,kjsize
+         do y=1,ny_fft,nby1
+            y2 = min(y+nby1-1,ny_fft)
+            do x=1,nxhpc,nbx
+               x2 = min(x+nbx-1,nxhpc)
+               do iy = y,y2
+                  do ix=x,x2
+                     tmp(iy,ix,z) = A(ix,iy,z,j)
+                  enddo
+               enddo
+            enddo
+         enddo
+
+         do x=1,nxhpc
+            do y=1,ny_fft
+               B(y,x,z,j) = tmp(y,x,z)
+            enddo
+         enddo
+      enddo
+
+      enddo
+!      deallocate(tmp)
+
+      return
+      end subroutine
+
+! This routine is called only when jproc=1, and only when stride1 is used
+! Transpose array in memory and transform forward in Z
+
+      subroutine reorder_trans_f2_many(A,B,dim,nv,op)
+
+      use fft_spec
+      implicit none
+
+      integer x,y,z,iy,iz,y2,z2,ierr,dnz,dny,nv,j,dim
+      complex(mytype) B(dim,nv)
+      complex(mytype) A(ny_fft,iisize,nz_fft,nv)
+!      complex(mytype) C(nz_fft,ny_fft)
+      character(len=3) op
+
+      do j=1,nv
+         call reorder_trans_f2(A(1,1,1,j),B(1,j),op)
+      enddo
+
+      return
+      end subroutine
+
+
+!=============================================
+      subroutine reorder_trans_b1(A,B,op)
 
       use fft_spec
 
-      complex(mytype) A(nzc,nyc,iisize)
       complex(mytype) B(ny_fft,iisize,nz_fft)
+      complex(mytype) A(nzc,nyc,iisize)
       complex(mytype) C(nz_fft,nyc)
       integer x,y,z,iy,iz,y2,z2,ierr,dnz,dny
       character(len=3) op
@@ -123,8 +226,8 @@
              enddo
           enddo
 
-	else
 
+	else
            do x=1,iisize
 	      do y=1,nyc
 	         do z=1,nzhc
@@ -184,6 +287,7 @@
 	   enddo
         enddo
       enddo
+	     
 
       return
       end subroutine
@@ -191,21 +295,18 @@
 ! This routine is called only when iproc=1, and only when stride1 is used
 ! Transpose array in memory and transform forward in Y
 
-!=============================================================
-      subroutine reorder_b2_many(A,B,nv)
-!=============================================================
+      subroutine reorder_b2(A,B)
 
       implicit none
 
-      complex(mytype) B(nxhp,ny_fft,kjsize,nv)
-      complex(mytype) A(ny_fft,nxhpc,kjsize,nv)
-      integer x,y,z,iy,x2,ix,y2,nv,j
+      complex(mytype) B(nxhp,ny_fft,kjsize)
+      complex(mytype) A(ny_fft,nxhpc,kjsize)
+      integer x,y,z,iy,x2,ix,y2
       complex(mytype), allocatable :: tmp(:,:)
 
 
       allocate(tmp(nxhpc,ny_fft))
 
-      do j=1,nv
       do z=1,kjsize
          do x=1,nxhpc,nbx
             x2 = min(x+nbx-1,nxhpc)
@@ -213,7 +314,7 @@
                y2 = min(y+nby1-1,ny_fft)
                do ix=x,x2
                   do iy = y,y2
-                     tmp(ix,iy) = A(iy,ix,z,j)
+                     tmp(ix,iy) = A(iy,ix,z)
                   enddo
                enddo
             enddo
@@ -221,14 +322,14 @@
 
          do y=1,ny_fft
             do x=1,nxhpc
-               B(x,y,z,j) = tmp(x,y)
+               B(x,y,z) = tmp(x,y)
             enddo
 	    do x=nxhpc+1,nxhp
-	       B(x,y,z,j) = 0.
+	       B(x,y,z) = 0.
 	    enddo
          enddo
       enddo
-      enddo
+
 
       deallocate(tmp)
 
@@ -238,21 +339,19 @@
 ! This routine is called only when iproc=1, and only when stride1 is used
 ! Transpose array in memory and transform forward in Y
 
-!=============================================================
-      subroutine reorder_f1_many(A,B,tmp,nv)
-!=============================================================
+      subroutine reorder_f1(A,B)
 
       implicit none
 
-      complex(mytype) A(nxhp,ny_fft,kjsize,nv)
-      complex(mytype) B(ny_fft,nxhpc,kjsize,nv)
-      integer x,y,z,iy,x2,ix,y2,dnx,nv,j
+      complex(mytype) A(nxhp,ny_fft,kjsize)
+      complex(mytype) B(ny_fft,nxhpc,kjsize)
+      integer x,y,z,iy,x2,ix,y2,dnx
       complex(mytype) tmp(ny_fft,nxhpc,kjsize)
 !      complex(mytype), allocatable :: tmp(:,:)
 
 !      allocate(tmp(ny_fft,nxhpc))
 
-       do j=1,nv
+
       do z=1,kjsize
          do y=1,ny_fft,nby1
             y2 = min(y+nby1-1,ny_fft)
@@ -260,7 +359,7 @@
                x2 = min(x+nbx-1,nxhpc)
                do iy = y,y2
                   do ix=x,x2
-                     tmp(iy,ix,z) = A(ix,iy,z,j)
+                     tmp(iy,ix,z) = A(ix,iy,z)
                   enddo
                enddo
             enddo
@@ -268,12 +367,12 @@
 
          do x=1,nxhpc
             do y=1,ny_fft
-               B(y,x,z,j) = tmp(y,x,z)
+               B(y,x,z) = tmp(y,x,z)
             enddo
          enddo
       enddo
 
-      enddo
+!      deallocate(tmp)
 
       return
       end subroutine
@@ -281,35 +380,15 @@
 ! This routine is called only when jproc=1, and only when stride1 is used
 ! Transpose array in memory and transform forward in Z
 
-!=============================================================
-      subroutine reorder_trans_f2_many(A,B,C,dim,nv,op)
-!=============================================================
+      subroutine reorder_trans_f2(A,B,op)
 
       use fft_spec
       implicit none
 
-      integer x,y,z,iy,iz,y2,z2,ierr,dnz,dny,nv,j,dim
-      complex(mytype) B(dim,nv)
-      complex(mytype) A(ny_fft,iisize,nz_fft,nv)
-      complex(mytype) C(nz_fft,ny_fft)
-      character(len=3) op
-
-      do j=1,nv
-         call reorder_trans_f2(A(1,1,1,j),B(1,j),C,op)
-      enddo
-
-      return
-      end subroutine
-
-      subroutine reorder_trans_f2(A,B,C,op)
-
-      use fft_spec
-      implicit none
-
-      integer x,y,z,iy,iz,y2,z2,ierr,dnz,dny
       complex(mytype) A(ny_fft,iisize,nz_fft)
       complex(mytype) B(nzc,nyc,iisize)
       complex(mytype) C(nz_fft,ny_fft)
+      integer x,y,z,iy,iz,y2,z2,ierr,dnz,dny
       character(len=3) op
 
       dnz = nz_fft - nzc
@@ -428,92 +507,3 @@
 
       return
       end subroutine
-
-
-! This routine is called only when iproc=1, and only when stride1 is used
-! Transpose array in memory and transform forward in Y
-
-!=============================================================
-      subroutine reorder_b2(A,B)
-!=============================================================
-
-      implicit none
-
-      complex(mytype) B(nxhp,ny_fft,kjsize)
-      complex(mytype) A(ny_fft,nxhpc,kjsize)
-      integer x,y,z,iy,x2,ix,y2
-      complex(mytype), allocatable :: tmp(:,:)
-
-
-      allocate(tmp(nxhpc,ny_fft))
-
-      do z=1,kjsize
-         do x=1,nxhpc,nbx
-            x2 = min(x+nbx-1,nxhpc)
-            do y=1,ny_fft,nby1
-               y2 = min(y+nby1-1,ny_fft)
-               do ix=x,x2
-                  do iy = y,y2
-                     tmp(ix,iy) = A(iy,ix,z)
-                  enddo
-               enddo
-            enddo
-         enddo
-
-         do y=1,ny_fft
-            do x=1,nxhpc
-               B(x,y,z) = tmp(x,y)
-            enddo
-	    do x=nxhpc+1,nxhp
-	       B(x,y,z) = 0.
-	    enddo
-         enddo
-      enddo
-
-
-      deallocate(tmp)
-
-      return
-      end subroutine
-
-! This routine is called only when iproc=1, and only when stride1 is used
-! Transpose array in memory and transform forward in Y
-
-!=============================================================
-      subroutine reorder_f1(A,B,tmp)
-!=============================================================
-
-      implicit none
-
-      complex(mytype) A(nxhp,ny_fft,kjsize)
-      complex(mytype) B(ny_fft,nxhpc,kjsize)
-      integer x,y,z,iy,x2,ix,y2,dnx
-      complex(mytype) tmp(ny_fft,nxhpc,kjsize)
-!      complex(mytype), allocatable :: tmp(:,:)
-
-!      allocate(tmp(ny_fft,nxhpc))
-
-
-      do z=1,kjsize
-         do y=1,ny_fft,nby1
-            y2 = min(y+nby1-1,ny_fft)
-            do x=1,nxhpc,nbx
-               x2 = min(x+nbx-1,nxhpc)
-               do iy = y,y2
-                  do ix=x,x2
-                     tmp(iy,ix,z) = A(ix,iy,z)
-                  enddo
-               enddo
-            enddo
-         enddo
-
-         do x=1,nxhpc
-            do y=1,ny_fft
-               B(y,x,z) = tmp(y,x,z)
-            enddo
-         enddo
-      enddo
-
-      return
-      end subroutine
-

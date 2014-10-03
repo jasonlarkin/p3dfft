@@ -4,8 +4,8 @@
 !
 !    Software Framework for Scalable Fourier Transforms in Three Dimensions
 !
-!    Copyright (C) 2006-2014 Dmitry Pekurovsky
-!    Copyright (C) 2006-2014 University of California
+!    Copyright (C) 2006-2010 Dmitry Pekurovsky
+!    Copyright (C) 2006-2010 University of California
 !    Copyright (C) 2010-2011 Jens Henrik Goebbert
 !
 !    This program is free software: you can redistribute it and/or modify
@@ -25,44 +25,24 @@
 !----------------------------------------------------------------------------
 
 ! =========================================================
-      subroutine p3dfft_setup_c(dims,nx,ny,nz,mpi_comm_in,nxcut,nycut,nzcut,OW,memsize) BIND(C,NAME='p3dfft_setup')
+      subroutine p3dfft_setup(dims,nx,ny,nz,mpi_comm_in,nxcut,nycut,nzcut,overwrite,memsize) 
+!BIND(C,NAME='p3dfft_setup')
 !========================================================
 
       use iso_c_binding
       implicit none
 
-      integer nx,ny,nz,mpi_comm_in,dims(2)
-      integer,intent (out) :: memsize (3)
-      integer,intent (in) :: nxcut,nycut,nzcut
-      integer,intent(in) :: OW
-      logical overwrite
-
-      if(OW .ne. 0) then
-         overwrite = .true.
-      else
-         overwrite = .false.
-      endif
-
-      call p3dfft_setup(dims,nx,ny,nz,mpi_comm_in,nxcut,nycut,nzcut,overwrite,memsize)
-
-      return
-      end subroutine
-
-! =========================================================
-      subroutine p3dfft_setup(dims,nx,ny,nz,mpi_comm_in,nxcut,nycut,nzcut,overwrite,memsize)
-!========================================================
-
-      implicit none
-
       integer i,j,k,nx,ny,nz,err,mpi_comm_in
       integer ierr, dims(2),  cartid(2)
       logical periodic(2),remain_dims(2)
-      integer impid, ippid, jmpid, jppid
-      integer(i8) n1,n2,pad1,padd
+      integer impid, ippid, jmpid, jppid,pad2
+      integer(i8) n1,n2,pad1
       real(mytype), allocatable :: R(:)
+      complex(mytype), allocatable :: buf1(:), buf2(:)
       integer, optional, intent (out) :: memsize (3)
       integer, optional, intent (in) :: nxcut,nycut,nzcut
       logical, optional, intent(in) :: overwrite
+      integer omp_get_num_threads
 
       integer my_start (3), my_end (3), my_size (3)
       integer my_proc_dims (2, 9)
@@ -133,6 +113,17 @@
          print *,'Using stride-1 layout'
       endif
 #endif
+
+      nthreads=1	
+!$OMP PARALLEL shared(nthreads)
+!$OMP MASTER
+      nthreads = OMP_GET_NUM_THREADS()		
+!$OMP END MASTER
+!$OMP END PARALLEL
+
+      if(taskid .eq. 0) then
+         print *,'Using ',nthreads,' threads'
+      endif 
 
       iproc = dims(1)
       jproc = dims(2)
@@ -321,21 +312,25 @@
 
 ! We may need to pad arrays due to uneven size
       padd = max(iisize*jjsize*nz_fft,iisize*ny_fft*kjsize) - nxhp*jisize*kjsize
-      padi = padd
-      if(padi .le. 0) then 
-         padi=0
+      if(padd .le. 0) then 
+         padd=0
       else
-         if(mod(padi,nxhp*jisize) .eq. 0) then
-            padi = padi / (nxhp*jisize)
+         if(mod(padd,nxhp*jisize) .eq. 0) then
+            padd = padd / (nxhp*jisize)
          else
-            padi = padi / (nxhp*jisize)+1
+            padd = padd / (nxhp*jisize)+1
          endif
 
       endif
 
+!      print *,taskid,': padd=',padd
 ! Initialize FFTW and allocate buffers for communication
-      nm = nxhp * jisize * (kjsize+padi) 
+      nm = nxhp * jisize * (kjsize+padd) 
       nv_preset = 1
+
+
+#ifdef FFTW
+
       if(nm .gt. 0) then       
         allocate(buf1(nm),stat=err)
         if(err .ne. 0) then
@@ -357,26 +352,36 @@
 
         call init_plan(buf1,R,buf2,nm)
 
-        deallocate(R)
-        allocate(buf(nm),stat=err)
-        if(err .ne. 0) then
-           print *,'p3dfft_setup: Error allocating buf (',nm
-        endif
+        deallocate(R,buf1,buf2)
 
+!        allocate(buf(nm),stat=err)
+!        if(err .ne. 0) then
+!           print *,'p3dfft_setup: Error allocating buf (',nm
+!        endif
 
      endif
 
-#ifdef USE_EVEN
-      n1 = IfCntMax * iproc /(mytype*2)
-      n2 = KfCntMax * jproc / (mytype*2)
-      n1 = max(n1,n2)
-      if(n1 .gt. nm) then
-         deallocate(buf1)
-         allocate(buf1(n1))
-         deallocate(buf2)
-         allocate(buf2(n1))
-      endif
+#elif defined ESSL
+      call init_work(nx,ny,nz)
 #endif
+
+
+
+#ifdef USE_EVEN
+       buf_size = max(IfCntMax*iproc,KfCntMax*jproc) / (mytype*2)
+#else
+       buf_size = nm
+#endif
+
+!      n1 = IfCntMax * iproc /(mytype*2)
+!      n2 = KfCntMax * jproc / (mytype*2)
+!      n1 = max(n1,n2)
+!      if(n1 .gt. nm) then
+!         deallocate(buf1)
+!         allocate(buf1(n1))
+!         deallocate(buf2)
+!         allocate(buf2(n1))
+!      endif
 
 !#ifdef USE_EVEN
 !       
@@ -434,6 +439,11 @@
          KfRcvStrt(i) = (kjst(i) -1) * iisize * jjsize*mytype*2
          KfRcvCnts(i) = iisize*jjsize*kjsz(i)*mytype*2
       end do
+
+!    if(taskid .eq. 0) then
+!       print *,'KfRcv Cnts and Strt:', kfrcvcnts,kfrcvstrt
+!    endif
+
 
 !   start pointers and types of send  for the 1st inverse transpose
       do i=0,jproc-1
@@ -515,24 +525,24 @@
     proc_parts = - 1
 
 !     calc max. needed memory (attention: cast to integer8 included)
-      pad1 = 2* max(nz*jjsize*iisize,ny*kjsize*iisize) - nx*jisize*kjsize
+      pad1 = 2* max(nz*jjsize*iisize,ny*kjsize*iisize) - kjsize
 !      print *,taskid,': pad1=',pad1
 
       if(pad1 .le. 0) then
         pad1 = 0
       endif  
 
-      padi=pad1
-      if(mod(padi,nx*jisize) .ne. 0) then
-         padi = padi / (nx*jisize) + 1
+      pad2 = pad1
+      if(modulo(pad2,nx*jisize) .ne. 0) then
+         pad1 = pad1 / (nx*jisize) + 1
       else
-         padi = padi / (nx*jisize)
+         pad1 = pad1 / (nx*jisize)
       endif   
 
 
 	maxisize = nx
 	maxjsize = jisize
-	maxksize = kjsize + padi
+	maxksize = kjsize + pad1
 
 	if(present(memsize)) then
 	  memsize(1) = maxisize

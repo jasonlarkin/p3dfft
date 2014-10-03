@@ -72,27 +72,12 @@
       integer stride_x1,stride_x2,stride_y1,stride_y2,N,m
       complex(mytype) X(N*stride_x1+m*stride_x2),Y(N*stride_y1+m*stride_y2)
 
-#ifdef FFTW
-#ifndef SINGLE_PREC
-         call dfftw_execute_dft(plan1_bc,X,Y)
-#else
-         call sfftw_execute_dft(plan1_bc,X,Y)
-#endif
-#elif defined ESSL
       integer mythread, OMP_GET_THREAD_NUM
       mythread = OMP_GET_THREAD_NUM()
 
-#ifndef SINGLE_PREC
       call dcft (0,X,stride_x1,stride_x2,Y,stride_y1,stride_y2,N,m,-1,1.0d0, &
               caux1(1,mythread),cnaux,caux2(1,mythread),cnaux)       
-#else
-      call scft (0,X,stride_x1,stride_x2,Y,stride_y1,stride_y2,N,m,-1,1.0, &
-              caux1(1,mythread),cnaux,caux2(1,mythread),cnaux)       
-#endif
 
-#else
-      Error: undefined FFT library
-#endif
       return
       end
 
@@ -106,27 +91,12 @@
       integer stride_x1,stride_x2,stride_y1,stride_y2,N,m
       complex(mytype) X(N*stride_x1+m*stride_x2),Y(N*stride_y1+m*stride_y2)
 
-#ifdef FFTW
-#ifndef SINGLE_PREC
-         call dfftw_execute_dft(plan2_bc_same,X,Y)
-#else
-         call sfftw_execute_dft(plan2_bc_same,X,Y)
-#endif
-#elif defined ESSL
       integer mythread, OMP_GET_THREAD_NUM
       mythread = OMP_GET_THREAD_NUM()
 
-#ifndef SINGLE_PREC
       call dcft (0,X,stride_x1,stride_x2,Y,stride_y1,stride_y2,N,m,-1,1.0d0, &
               caux1(1,mythread),cnaux,caux2(1,mythread),cnaux)       
-#else
-      call scft (0,X,stride_x1,stride_x2,Y,stride_y1,stride_y2,N,m,-1,1.0, &
-              caux1(1,mythread),cnaux,caux2(1,mythread),cnaux)       
-#endif
 
-#else
-      Error: undefined FFT library
-#endif
       return
       end
 
@@ -140,27 +110,12 @@
       integer stride_x1,stride_x2,stride_y1,stride_y2,N,m
       complex(mytype) X(N*stride_x1+m*stride_x2),Y(N*stride_y1+m*stride_y2)
 
-#ifdef FFTW
-#ifndef SINGLE_PREC
-         call dfftw_execute_dft(plan2_bc_dif,X,Y)
-#else
-         call sfftw_execute_dft(plan2_bc_dif,X,Y)
-#endif
-#elif defined ESSL
       integer mythread, OMP_GET_THREAD_NUM
       mythread = OMP_GET_THREAD_NUM()
 
-#ifndef SINGLE_PREC
       call dcft (0,X,stride_x1,stride_x2,Y,stride_y1,stride_y2,N,m,-1,1.0d0, &
               caux1(1,mythread),cnaux,caux2(1,mythread),cnaux)       
-#else
-      call scft (0,X,stride_x1,stride_x2,Y,stride_y1,stride_y2,N,m,-1,1.0, &
-              caux1(1,mythread),cnaux,caux2(1,mythread),cnaux)       
-#endif
 
-#else
-      Error: undefined FFT library
-#endif
       return
       end
 
@@ -176,27 +131,11 @@
       complex(mytype) X((N/2+1)*m)
       real(mytype) Y(N*m)
 
-#ifdef FFTW
-#ifndef SINGLE_PREC
-      call dfftw_execute_dft_c2r(plan1_bcr,X,Y)
-#else
-      call sfftw_execute_dft_c2r(plan1_bcr,X,Y)
-#endif
-
-#elif defined ESSL
       integer mythread, OMP_GET_THREAD_NUM
       mythread = OMP_GET_THREAD_NUM()
 
-#ifndef SINGLE_PREC
       call dcrft(0,X,dimx,Y,dimy,N,m,-1,1.0d0, &
             raux1(1,mythread), rnaux1,raux2(1,mythread),rnaux2,raux3,1)  
-#else
-      call scrft(0,X,dimx,Y,dimy,N,m,-1,1.0, &
-            raux1(1,mythread), rnaux1,raux2(1,mythread),rnaux2,raux3,1)  
-#endif
-#else
-      Error: unknown FFT library
-#endif
 
       return
       end
@@ -213,27 +152,11 @@
       complex(mytype) X(N*stride_x1+m*stride_x2),Y(N*stride_y1+m*stride_y2)
 
 
-#ifdef FFTW
-#ifndef SINGLE_PREC
-      call dfftw_execute_dft(plan1_fc,X,Y)
-#else
-      call sfftw_execute_dft(plan1_fc,X,Y)
-#endif
-
-#elif defined ESSL
       integer mythread, OMP_GET_THREAD_NUM
       mythread = OMP_GET_THREAD_NUM()
 
-#ifndef SINGLE_PREC
       call dcft(0,X,stride_x1,stride_x2,Y,stride_y1,stride_y2,N,m,1,1.0d0,&
               caux1(1,mythread),cnaux,caux2(1,mythread),cnaux)
-#else
-      call scft(0,X,stride_x1,stride_x2,Y,stride_y1,stride_y2,N,m,1,1.0,  &
-              caux1(1,mythread),cnaux,caux2(1,mythread),cnaux)
-#endif
-#else
-      Error: undefined FFT library 
-#endif
 
       return
       end
@@ -247,27 +170,11 @@
       integer N,m,stride_x1,stride_x2,stride_y1,stride_y2
       complex(mytype) X(N*stride_x1+m*stride_x2),Y(N*stride_y1+m*stride_y2)
 
-#ifdef FFTW
-#ifndef SINGLE_PREC
-      call dfftw_execute_dft(plan2_fc_same,X,Y)
-#else
-      call sfftw_execute_dft(plan2_fc_same,X,Y)
-#endif
-
-#elif defined ESSL
       integer mythread, OMP_GET_THREAD_NUM
       mythread = OMP_GET_THREAD_NUM()
 
-#ifndef SINGLE_PREC
       call dcft(0,X,stride_x1,stride_x2,Y,stride_y1,stride_y2,N,m,1,1.0d0, &
               caux1(1,mythread),cnaux,caux2(1,mythread),cnaux)
-#else
-      call scft(0,X,stride_x1,stride_x2,Y,stride_y1,stride_y2,N,m,1,1.0,  &
-              caux1(1,mythread),cnaux,caux2(1,mythread),cnaux)
-#endif
-#else
-      Error: undefined FFT library 
-#endif
 
       return
       end
@@ -281,31 +188,12 @@
       integer N,m,stride_x1,stride_x2,stride_y1,stride_y2
       complex(mytype) X(N*stride_x1+m*stride_x2),Y(N*stride_y1+m*stride_y2)
 
-#ifdef FFTW
-#ifndef SINGLE_PREC
-      call dfftw_execute_dft(plan2_fc_dif,X,Y)
-#else
-      call sfftw_execute_dft(plan2_fc_dif,X,Y)
-#endif
-
-#elif defined ESSL
       integer mythread, OMP_GET_THREAD_NUM
       mythread = OMP_GET_THREAD_NUM()
 
-#ifdef DEBUG
-      print *,taskid,': Executing dcft dif', stride_x1,stride_x2,stride_y1,stride_y2,N,m,cnaux
-#endif
 
-#ifndef SINGLE_PREC
       call dcft(0,X,stride_x1,stride_x2,Y,stride_y1,stride_y2,N,m,1,1.0d0, &
               caux1(1,mythread),cnaux,caux2(1,mythread),cnaux)
-#else
-      call scft(0,X,stride_x1,stride_x2,Y,stride_y1,stride_y2,N,m,1,1.0,  &
-              caux1(1,mythread),cnaux,caux2(1,mythread),cnaux)
-#endif
-#else
-      Error: undefined FFT library 
-#endif
 
       return
       end
@@ -321,28 +209,11 @@
       real(mytype) X(N*m)
       complex(mytype) Y((N/2+1)*m)
 
-#ifdef FFTW
-
-#ifndef SINGLE_PREC
-      call dfftw_execute_dft_r2c(plan1_frc,X,Y)
-#else
-      call sfftw_execute_dft_r2c(plan1_frc,X,Y)
-#endif
-
-#elif defined ESSL
       integer mythread, OMP_GET_THREAD_NUM
       mythread = OMP_GET_THREAD_NUM()
 
-#ifndef SINGLE_PREC
       call drcft(0,X,dimx,Y,dimy,N,m,1,1.0d0, &
             raux1(1,mythread), rnaux1,raux2(1,mythread),rnaux2,raux3,1)     
-#else
-      call srcft(0,X,dimx,Y,dimy,N,m,1,1.0, &
-            raux1(1,mythread), rnaux1,raux2(1,mythread),rnaux2,raux3,1)     
-#endif
-#else
-      Error: undefined FFT library
-#endif
 
       return
       end
@@ -361,31 +232,14 @@ subroutine exec_ctrans_r2_same (X, stride_x1, stride_x2, Y, stride_y1, stride_y2
     real (mytype) :: X (N*m), Y (N*m)
     integer :: nm2
  
-#ifdef FFTW
- 
-#ifndef SINGLE_PREC
-    call dfftw_execute_r2r (plan_ctrans_same, X, Y)
-#else
-    call sfftw_execute_r2r (plan_ctrans_same, X, Y)
-#endif
-#elif defined ESSL
       integer mythread, OMP_GET_THREAD_NUM
       mythread = OMP_GET_THREAD_NUM()
     nm2 = (N-1) * 2
  
-#ifndef SINGLE_PREC
     call dcosf (0, X, stride_x1, stride_x2, &
                    Y, stride_y1, stride_y2, &
                    nm2, m, 2.0d0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
-#else
-    call scosf (0, X, stride_x1, stride_x2, &
-                   Y, stride_y1, stride_y2, &
-                   nm2, m, 2.0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
-#endif
  
-#else
-    Error: undefined FFT library
-#endif
     return
 end
 
@@ -398,31 +252,14 @@ subroutine exec_ctrans_r2_dif (X, stride_x1, stride_x2, Y, stride_y1, stride_y2,
     real (mytype) :: X (N*m), Y (N*m)
     integer :: nm2
  
-#ifdef FFTW
- 
-#ifndef SINGLE_PREC
-    call dfftw_execute_r2r (plan_ctrans_dif, X, Y)
-#else
-    call sfftw_execute_r2r (plan_ctrans_dif, X, Y)
-#endif
-#elif defined ESSL
       integer mythread, OMP_GET_THREAD_NUM
       mythread = OMP_GET_THREAD_NUM()
     nm2 = (N-1) * 2
  
-#ifndef SINGLE_PREC
     call dcosf (0, X, stride_x1, stride_x2, &
                    Y, stride_y1, stride_y2, &
                    nm2, m, 2.0d0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
-#else
-    call scosf (0, X, stride_x1, stride_x2, &
-                   Y, stride_y1, stride_y2, &
-                   nm2, m, 2.0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
-#endif
  
-#else
-    Error: undefined FFT library
-#endif
     return
 end
 
@@ -436,39 +273,17 @@ subroutine exec_ctrans_r2_complex_same (X, stride_x1, stride_x2, Y, stride_y1, s
     real (mytype) :: X (N*m), Y (N*m)
     integer :: nm2
  
-#ifdef FFTW
- 
-#ifndef SINGLE_PREC
-    call dfftw_execute_r2r (plan_ctrans_same, X, Y)
-    call dfftw_execute_r2r (plan_ctrans_same, X(2), Y(2))
-#else
-    call sfftw_execute_r2r (plan_ctrans_same, X, Y)
-    call sfftw_execute_r2r (plan_ctrans_same, X(2), Y(2))
-#endif
-#elif defined ESSL
       integer mythread, OMP_GET_THREAD_NUM
       mythread = OMP_GET_THREAD_NUM()
     nm2 = (N-1) * 2
  
-#ifndef SINGLE_PREC
     call dcosf (0, X, stride_x1, stride_x2, &
                    Y, stride_y1, stride_y2, &
                    nm2, m, 2.0d0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
     call dcosf (0, X(2), stride_x1, stride_x2, &
                    Y(2), stride_y1, stride_y2, &
                    nm2, m, 2.0d0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
-#else
-    call scosf (0, X, stride_x1, stride_x2, &
-                   Y, stride_y1, stride_y2, &
-                   nm2, m, 2.0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
-!    call scosf (0, X(2), stride_x1, stride_x2, &
-!                   Y(2), stride_y1, stride_y2, &
-!                   nm2, m, 2.0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
-#endif
  
-#else
-    Error: undefined FFT library
-#endif
     return
 end
 
@@ -482,39 +297,17 @@ subroutine exec_ctrans_r2_complex_dif (X, stride_x1, stride_x2, Y, stride_y1, st
     real (mytype) :: X (N*m), Y (N*m)
     integer :: nm2
  
-#ifdef FFTW
- 
-#ifndef SINGLE_PREC
-    call dfftw_execute_r2r (plan_ctrans_dif, X, Y)
-    call dfftw_execute_r2r (plan_ctrans_dif, X(2), Y(2))
-#else
-    call sfftw_execute_r2r (plan_ctrans_dif, X, Y)
-    call sfftw_execute_r2r (plan_ctrans_dif, X(2), Y(2))
-#endif
-#elif defined ESSL
       integer mythread, OMP_GET_THREAD_NUM
       mythread = OMP_GET_THREAD_NUM()
     nm2 = (N-1) * 2
  
-#ifndef SINGLE_PREC
     call dcosf (0, X, stride_x1, stride_x2, &
                    Y, stride_y1, stride_y2, &
                    nm2, m, 2.0d0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
     call dcosf (0, X(2), stride_x1, stride_x2, &
                    Y(2), stride_y1, stride_y2, &
                    nm2, m, 2.0d0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
-#else
-    call scosf (0, X, stride_x1, stride_x2, &
-                   Y, stride_y1, stride_y2, &
-                   nm2, m, 2.0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
-!    call scosf (0, X(2), stride_x1, stride_x2, &
-!                   Y(2), stride_y1, stride_y2, &
-!                   nm2, m, 2.0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
-#endif
  
-#else
-    Error: undefined FFT library
-#endif
     return
 end
 
@@ -533,31 +326,14 @@ subroutine exec_strans_r2_same (X, stride_x1, stride_x2, Y, stride_y1, stride_y2
     real (mytype) :: X (N*m), Y (N*m)
     integer :: nm2
  
-#ifdef FFTW
- 
-#ifndef SINGLE_PREC
-    call dfftw_execute_r2r (plan_strans_same, X, Y)
-#else
-    call sfftw_execute_r2r (plan_strans_same, X, Y)
-#endif
-#elif defined ESSL
       integer mythread, OMP_GET_THREAD_NUM
       mythread = OMP_GET_THREAD_NUM()
     nm2 = (N-1) * 2
  
-#ifndef SINGLE_PREC
     call dsinf (0, X, stride_x1, stride_x2, &
                    Y, stride_y1, stride_y2, &
                    nm2, m, 2.0d0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
-#else
-    call ssinf (0, X, stride_x1, stride_x2, &
-                   Y, stride_y1, stride_y2, &
-                   nm2, m, 2.0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
-#endif
  
-#else
-    Error: undefined FFT library
-#endif
     return
 end
 
@@ -570,31 +346,14 @@ subroutine exec_strans_r2_dif (X, stride_x1, stride_x2, Y, stride_y1, stride_y2,
     real (mytype) :: X (N*m), Y (N*m)
     integer :: nm2
  
-#ifdef FFTW
- 
-#ifndef SINGLE_PREC
-    call dfftw_execute_r2r (plan_strans_dif, X, Y)
-#else
-    call sfftw_execute_r2r (plan_strans_dif, X, Y)
-#endif
-#elif defined ESSL
       integer mythread, OMP_GET_THREAD_NUM
       mythread = OMP_GET_THREAD_NUM()
     nm2 = (N-1) * 2
  
-#ifndef SINGLE_PREC
     call dsinf (0, X, stride_x1, stride_x2, &
                    Y, stride_y1, stride_y2, &
                    nm2, m, 2.0d0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
-#else
-    call ssinf (0, X, stride_x1, stride_x2, &
-                   Y, stride_y1, stride_y2, &
-                   nm2, m, 2.0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
-#endif
  
-#else
-    Error: undefined FFT library
-#endif
     return
 end
 
@@ -608,39 +367,17 @@ subroutine exec_strans_r2_complex_same (X, stride_x1, stride_x2, Y, stride_y1, s
     real (mytype) :: X (N*m), Y (N*m)
     integer :: nm2
  
-#ifdef FFTW
- 
-#ifndef SINGLE_PREC
-    call dfftw_execute_r2r (plan_strans_same, X, Y)
-    call dfftw_execute_r2r (plan_strans_same, X(2), Y(2))
-#else
-    call sfftw_execute_r2r (plan_strans_same, X, Y)
-    call sfftw_execute_r2r (plan_strans_same, X(2), Y(2))
-#endif
-#elif defined ESSL
       integer mythread, OMP_GET_THREAD_NUM
       mythread = OMP_GET_THREAD_NUM()
     nm2 = (N-1) * 2
  
-#ifndef SINGLE_PREC
     call dsinf (0, X, stride_x1, stride_x2, &
                    Y, stride_y1, stride_y2, &
                    nm2, m, 2.0d0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
     call dsinf (0, X(2), stride_x1, stride_x2, &
                    Y(2), stride_y1, stride_y2, &
                    nm2, m, 2.0d0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
-#else
-    call ssinf (0, X, stride_x1, stride_x2, &
-                   Y, stride_y1, stride_y2, &
-                   nm2, m, 2.0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
-    call ssinf (0, X(2), stride_x1, stride_x2, &
-                   Y(2), stride_y1, stride_y2, &
-                   nm2, m, 2.0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
-#endif
  
-#else
-    Error: undefined FFT library
-#endif
     return
 end
 
@@ -654,40 +391,18 @@ subroutine exec_strans_r2_complex_dif (X, stride_x1, stride_x2, Y, stride_y1, st
     real (mytype) :: X (N*m), Y (N*m)
     integer :: nm2
  
-#ifdef FFTW
- 
-#ifndef SINGLE_PREC
-    call dfftw_execute_r2r (plan_strans_dif, X, Y)
-    call dfftw_execute_r2r (plan_strans_dif, X(2), Y(2))
-#else
-    call sfftw_execute_r2r (plan_strans_dif, X, Y)
-    call sfftw_execute_r2r (plan_strans_dif, X(2), Y(2))
-#endif
-#elif defined ESSL
       integer mythread, OMP_GET_THREAD_NUM
       mythread = OMP_GET_THREAD_NUM()
 
     nm2 = (N-1) * 2
  
-#ifndef SINGLE_PREC
     call dsinf (0, X, stride_x1, stride_x2, &
                    Y, stride_y1, stride_y2, &
                    nm2, m, 2.0d0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
     call dsinf (0, X(2), stride_x1, stride_x2, &
                    Y(2), stride_y1, stride_y2, &
                    nm2, m, 2.0d0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
-#else
-    call ssinf (0, X, stride_x1, stride_x2, &
-                   Y, stride_y1, stride_y2, &
-                   nm2, m, 2.0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
-    call ssinf (0, X(2), stride_x1, stride_x2, &
-                   Y(2), stride_y1, stride_y2, &
-                   nm2, m, 2.0, caux1(1,mythread), cnaux, caux2(1,mythread), cnaux)
-#endif
  
-#else
-    Error: undefined FFT library
-#endif
     return
 end
 

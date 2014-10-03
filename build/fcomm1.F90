@@ -4,8 +4,8 @@
 !
 !    Software Framework for Scalable Fourier Transforms in Three Dimensions
 !
-!    Copyright (C) 2006-2014 Dmitry Pekurovsky
-!    Copyright (C) 2006-2014 University of California
+!    Copyright (C) 2006-2010 Dmitry Pekurovsky
+!    Copyright (C) 2006-2010 University of California
 !    Copyright (C) 2010-2011 Jens Henrik Goebbert
 !
 !    This program is free software: you can redistribute it and/or modify
@@ -38,7 +38,7 @@
 #else
       complex(mytype) dest(iisize,ny_fft,kjsize,nv)
 #endif
-
+	
       real(r8) t,tc
       integer x,y,i,ierr,z,xs,j,n,ix,iy,y2,x2,l,nv
       integer(i8) position,pos1,pos0,pos2
@@ -46,6 +46,7 @@
       integer rcvcnts(0:iproc-1)
       integer sndstrt(0:iproc-1)
       integer rcvstrt(0:iproc-1)
+      complex(mytype) buf1(buf_size*nv), buf2(buf_size*nv)
 
 !	if(taskid .eq. 0) then
 !	  print *,'Entering fcomm1'
@@ -54,7 +55,7 @@
 
 ! Pack the send buffer for exchanging y and x (within a given z plane ) into sendbuf
 
-      tc = tc - MPI_Wtime()
+!      tc = tc - MPI_Wtime()
 
       do i=0,iproc-1
 #ifdef USE_EVEN
@@ -73,8 +74,8 @@
             enddo
 	 enddo
       enddo
-      tc = tc + MPI_Wtime()
-      t = t - MPI_Wtime()
+!      tc = tc + MPI_Wtime()
+!      t = t - MPI_Wtime()
 
 #ifdef USE_EVEN
 
@@ -93,8 +94,8 @@
       call mpi_alltoallv(buf1,SndCnts, SndStrt,mpi_byte, buf2,RcvCnts, RcvStrt,mpi_byte,mpi_comm_row,ierr)
 #endif
 
-      t = MPI_Wtime() + t
-      tc = - MPI_Wtime() + tc
+!      t = MPI_Wtime() + t
+!      tc = - MPI_Wtime() + tc
 
 ! Unpack the data
 
@@ -140,7 +141,7 @@
       enddo
       enddo
 
-      tc = tc + MPI_Wtime()
+!      tc = tc + MPI_Wtime()
 
 
       return
@@ -162,6 +163,8 @@
       real(r8) t,tc
       integer x,y,i,ierr,z,xs,j,n,ix,iy,y2,x2,l
       integer(i8) position,pos1,pos0,pos2
+      complex(mytype), allocatable :: buf1(:),buf2(:)
+      integer threadid,omp_get_thread_num
 
 !	if(taskid .eq. 0) then
 !	  print *,'Entering fcomm1'
@@ -170,7 +173,10 @@
 
 ! Pack the send buffer for exchanging y and x (within a given z plane ) into sendbuf
 
-      tc = tc - MPI_Wtime()
+!      tc = tc - MPI_Wtime()
+
+     allocate(buf1(buf_size))
+     allocate(buf2(buf_size))
 
       do i=0,iproc-1
 #ifdef USE_EVEN
@@ -187,8 +193,16 @@
             enddo
          enddo
       enddo
-      tc = tc + MPI_Wtime()
-      t = t - MPI_Wtime()
+!      tc = tc + MPI_Wtime()
+!      t = t - MPI_Wtime()
+
+#ifdef DEBUG
+      threadid = OMP_GET_THREAD_NUM()
+      print *,taskid,threadid,": Passed alltoall in fcomm1"
+!$OMP FLUSH
+#endif
+
+!$OMP ordered
 
 #ifdef USE_EVEN
 
@@ -200,11 +214,24 @@
 #else
 ! Use MPI_Alltoallv
 ! Exchange the y-x buffers (in rows of processors)
+
+#ifdef DEBUG
+      print *,taskid,threadid,": Calling alltoall in fcomm1"
+!$OMP FLUSH
+#endif
       call mpi_alltoallv(buf1,IfSndCnts, IfSndStrt,mpi_byte, buf2,IfRcvCnts, IfRcvStrt,mpi_byte,mpi_comm_row,ierr)
 #endif
 
-      t = MPI_Wtime() + t
-      tc = - MPI_Wtime() + tc
+!$OMP end ordered
+
+#ifdef DEBUG
+      print *,taskid,threadid,": Passed alltoall in fcomm1"
+!$OMP FLUSH
+#endif
+!      t = MPI_Wtime() + t
+!      tc = - MPI_Wtime() + tc
+
+      deallocate(buf1)
 
 ! Unpack the data
 
@@ -249,7 +276,8 @@
          enddo
       enddo
 
-      tc = tc + MPI_Wtime()
+	deallocate(buf2)
+!      tc = tc + MPI_Wtime()
 
 
       return

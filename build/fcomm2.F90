@@ -4,8 +4,8 @@
 !
 !    Software Framework for Scalable Fourier Transforms in Three Dimensions
 !
-!    Copyright (C) 2006-2014 Dmitry Pekurovsky
-!    Copyright (C) 2006-2014 University of California
+!    Copyright (C) 2006-2010 Dmitry Pekurovsky
+!    Copyright (C) 2006-2010 University of California
 !    Copyright (C) 2010-2011 Jens Henrik Goebbert
 !    This program is free software: you can redistribute it and/or modify
 !    it under the terms of the GNU General Public License as published by
@@ -41,11 +41,77 @@
       integer rcvstrt(0:jproc-1)
       complex(mytype) source(iisize,ny_fft,kjsize,nv)
       complex(mytype) dest(dim_out,nv)
+      complex(mytype) buf1(buf_size*nv), buf2(buf_size,nv)
 
+
+!	if(taskid .eq. 0) then
+!	  print *,'Entring fcomm2'
+!        endif	
+!	call print_buf(source,iisize,ny_fft,kjsize)
+
+      dny = ny_fft-nyc
 
 ! Pack send buffers for exchanging y and z for all x at once 
 
-      call pack_fcomm2_many(buf1,source,nv)
+      position = 1
+      do j=1,nv
+
+      do i=0,jproc-1
+#ifdef USE_EVEN
+         pos0 = (i * nv +(j-1))* KfCntMax/(mytype*2)  + 1 
+#else
+         pos0 = (nv * KfSndStrt(i) + (j-1)*KfSndCnts(i))/(mytype*2)+ 1 
+#endif
+
+
+! If clearly in the first half of ny
+
+         if(jjen(i) .le. nyhc) then
+     	    do z=1,kjsize
+               position = pos0 +(z-1)*jjsz(i)*iisize
+               do y=jjst(i),jjen(i)
+   		  do x=1,iisize
+                     buf1(position) = source(x,y,z,j)
+                     position = position+1
+                  enddo
+               enddo	
+            enddo
+
+! If clearly in the second half of ny
+         else if (jjst(i) .ge. nyhc+1) then
+     	    do z=1,kjsize
+               position = pos0 +(z-1)*jjsz(i)*iisize
+               do y=jjst(i)+dny,jjen(i)+dny
+                  do x=1,iisize
+                     buf1(position) = source(x,y,z,j)
+                     position = position+1
+                  enddo
+               enddo	
+            enddo
+
+
+
+! If spanning the first and second half of ny (e.g. iproc is odd)
+         else
+     	    do z=1,kjsize
+               position = pos0 +(z-1)*jjsz(i)*iisize
+               do y=jjst(i),nyhc
+                  do x=1,iisize
+                     buf1(position) = source(x,y,z,j)
+                     position = position+1
+                  enddo
+	       enddo	
+               do y=ny_fft-nyhc+1,jjen(i)+dny
+                  do x=1,iisize
+                     buf1(position) = source(x,y,z,j)
+                     position = position+1
+                  enddo
+               enddo	
+            enddo
+         endif
+
+      enddo
+      enddo
       
 ! Exchange y-z buffers in columns of processors
 
@@ -73,7 +139,7 @@
 
          tc = tc - MPI_Wtime()
 	 do j=1,nv
-	    call unpack_fcomm2(dest(1,j),j,nv)
+	    call unpack_fcomm2(dest(1,j),buf2(1,j),j,nv)
          enddo
 
          tc = tc + MPI_Wtime()
@@ -83,85 +149,14 @@
       return
       end subroutine
 
-      subroutine pack_fcomm2_many(sndbuf,source,nv)
 
-      use fft_spec
-      implicit none
-
-      complex(mytype) source(iisize,ny_fft,kjsize,nv)
-      complex(mytype) sndbuf(iisize*ny_fft*kjsize*nv)
-      integer nv,j,i,position,pos0,pos1,x,y,z,dny
-
-      dny = ny_fft-nyc
-      position = 1
-      do j=1,nv
-
-      do i=0,jproc-1
-#ifdef USE_EVEN
-         pos0 = (i * nv +(j-1))* KfCntMax/(mytype*2)  + 1 
-#else
-         pos0 = (nv * KfSndStrt(i) + (j-1)*KfSndCnts(i))/(mytype*2)+ 1 
-#endif
-
-
-! If clearly in the first half of ny
-
-         if(jjen(i) .le. nyhc) then
-     	    do z=1,kjsize
-               position = pos0 +(z-1)*jjsz(i)*iisize
-               do y=jjst(i),jjen(i)
-   		  do x=1,iisize
-                     sndbuf(position) = source(x,y,z,j)
-                     position = position+1
-                  enddo
-               enddo	
-            enddo
-
-! If clearly in the second half of ny
-         else if (jjst(i) .ge. nyhc+1) then
-     	    do z=1,kjsize
-               position = pos0 +(z-1)*jjsz(i)*iisize
-               do y=jjst(i)+dny,jjen(i)+dny
-                  do x=1,iisize
-                     sndbuf(position) = source(x,y,z,j)
-                     position = position+1
-                  enddo
-               enddo	
-            enddo
-
-
-
-! If spanning the first and second half of ny (e.g. iproc is odd)
-         else
-     	    do z=1,kjsize
-               position = pos0 +(z-1)*jjsz(i)*iisize
-               do y=jjst(i),nyhc
-                  do x=1,iisize
-                     sndbuf(position) = source(x,y,z,j)
-                     position = position+1
-                  enddo
-	       enddo	
-               do y=ny_fft-nyhc+1,jjen(i)+dny
-                  do x=1,iisize
-                     sndbuf(position) = source(x,y,z,j)
-                     position = position+1
-                  enddo
-               enddo	
-            enddo
-         endif
-
-      enddo
-      enddo
-
-      end subroutine
-
-
-      subroutine unpack_fcomm2(dest,j,nv)
+      subroutine unpack_fcomm2(dest,recvbuf,j,nv)
 
       implicit none
       integer j,i,x,y,z,nv
       integer*8 position
       complex(mytype) dest(iisize,jjsize,nz_fft)
+      complex(mytype) recvbuf(buf_size*nv)
 
 
          do i=0,jproc-1
@@ -175,7 +170,7 @@
             do z=kjst(i),kjen(i)
                do y=1,jjsize
                   do x=1,iisize
-                     dest(x,y,z) = buf2(position)
+                     dest(x,y,z) = recvbuf(position)
                      position = position +1
                   enddo
                enddo
@@ -196,69 +191,19 @@
       real(r8) t,tc
       integer x,z,y,i,ierr,xs,ys,y2,z2,iy,iz,dny
       integer(i8) position,pos1,pos0
+      complex(mytype), allocatable :: buf1(:),buf2(:)
 
+!	if(taskid .eq. 0) then
+!	  print *,'Entring fcomm2'
+!        endif	
+!	call print_buf(source,iisize,ny_fft,kjsize)
 
-
-! Pack send buffers for exchanging y and z for all x at once 
-     call pack_fcomm2(buf1,source) 
-      
-! Exchange y-z buffers in columns of processors
-
-      t = t - MPI_Wtime()
-
-#ifdef USE_EVEN
-! Use MPI_Alltoall
-
-      if(KfCntUneven) then
-
-         call mpi_alltoall(buf1,KfCntMax, mpi_byte, &
-           buf2,KfCntMax, mpi_byte,mpi_comm_col,ierr)
-
-         t = MPI_Wtime() + t
-
-         tc = tc - MPI_Wtime()
-
-         position = 1
-         do i=0,jproc-1
-            do z=kjst(i),kjen(i)
-               do y=1,jjsize
-                  do x=1,iisize
-                     dest(x,y,z) = buf2(position)
-                     position = position +1
-                  enddo
-               enddo
-            enddo
-            position = (i+1)*KfCntMax/(mytype*2)+1
-         enddo
-
-         tc = tc + MPI_Wtime()
-
-      else
-
-         call mpi_alltoall(buf1,KfCntMax, mpi_byte, &
-           dest,KfCntMax, mpi_byte,mpi_comm_col,ierr)
-         t = MPI_Wtime() + t
-
-      endif
-
-#else
-! Use MPI_Alltoallv
-
-      call mpi_alltoallv(buf1,KfSndCnts, KfSndStrt,mpi_byte, &
-           dest,KfRcvCnts, KfRcvStrt,mpi_byte,mpi_comm_col,ierr)
-      t = MPI_Wtime() + t
-         
-#endif
-      return
-      end subroutine
-
-      subroutine pack_fcomm2(buf1,source)
-
-      complex(mytype) source(iisize,ny_fft,kjsize)
-      complex(mytype) buf1(iisize*ny_fft*kjsize)
-      integer i,dny,position,pos0,x,y,z
+     allocate(buf1(buf_size))
 
       dny = ny_fft-nyc
+
+! Pack send buffers for exchanging y and z for all x at once 
+
       position = 1
       do i=0,jproc-1
 #ifdef USE_EVEN
@@ -314,6 +259,65 @@
          endif
 
       enddo
+      
+! Exchange y-z buffers in columns of processors
 
+      t = t - MPI_Wtime()
+
+#ifdef USE_EVEN
+! Use MPI_Alltoall
+
+      if(KfCntUneven) then
+
+     allocate(buf2(comm_buf_size))
+
+!$OMP ordered
+         call mpi_alltoall(buf1,KfCntMax, mpi_byte, &
+           buf2,KfCntMax, mpi_byte,mpi_comm_col,ierr)
+!$OMP end ordered
+
+         t = MPI_Wtime() + t
+
+         tc = tc - MPI_Wtime()
+
+	deallocate(buf1)
+         position = 1
+         do i=0,jproc-1
+            do z=kjst(i),kjen(i)
+               do y=1,jjsize
+                  do x=1,iisize
+                     dest(x,y,z) = buf2(position)
+                     position = position +1
+                  enddo
+               enddo
+            enddo
+            position = (i+1)*KfCntMax/(mytype*2)+1
+         enddo
+
+         tc = tc + MPI_Wtime()
+
+        deallocate(buf2)
+
+      else
+
+!$OMP ordered
+         call mpi_alltoall(buf1,KfCntMax, mpi_byte, &
+           dest,KfCntMax, mpi_byte,mpi_comm_col,ierr)
+!$OMP end ordered
+         t = MPI_Wtime() + t
+
+      endif
+
+#else
+
+!$OMP ordered
+      call mpi_alltoallv(buf1,KfSndCnts, KfSndStrt,mpi_byte, &
+           dest,KfRcvCnts, KfRcvStrt,mpi_byte,mpi_comm_col,ierr)
+!$OMP end ordered
+      t = MPI_Wtime() + t
+         
+#endif
+
+	deallocate(buf1)
       return
       end subroutine

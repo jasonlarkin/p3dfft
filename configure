@@ -653,7 +653,6 @@ CC
 OBJEXT
 EXEEXT
 ac_ct_FC
-LDFLAGS
 FCFLAGS
 FC
 SUCCESS
@@ -662,6 +661,7 @@ CDFLAGS
 FFTWF
 FFTW_LIB
 FFTW_INC
+LDFLAGS
 FORTRAN_LIB
 am__untar
 am__tar
@@ -729,7 +729,6 @@ enable_option_checking
 enable_ibm
 enable_intel
 enable_pgi
-enable_cray
 enable_gnu
 enable_single
 enable_oned
@@ -1387,7 +1386,6 @@ Optional Features:
   --enable-ibm            compile P3DFFT using IBM compiler
   --enable-intel          compile P3DFFT using Intel compiler
   --enable-pgi            compile P3DFFT using PGI compiler
-  --enable-cray           compile P3DFFT using CRAY compiler
   --enable-gnu            compile P3DFFT using GNU compiler
   --enable-single         compile P3DFFT in single precision (default is
                           double precision)
@@ -2469,13 +2467,8 @@ _ACEOF
 
 	eval "ARRAY${N}='-DINTEL'"
 	N=`expr $N + 1`
-	if (( `echo $HOST | grep -c "blacklight"` > 0 )); then
-	FORTRAN_LIB="-lmpi -limf -lifcore"
-
-	else
 	FORTRAN_LIB="-lmpichf90 -limf -lifcore"
 
-	fi
 #        FORTRAN_LIB="-lmpi_f90 -limf -lifcore"
 fi
 
@@ -2504,30 +2497,6 @@ _ACEOF
 
 fi
 
-# check whether to compile using Cray
-{ $as_echo "$as_me:$LINENO: checking whether to use Cray compiler" >&5
-$as_echo_n "checking whether to use Cray compiler... " >&6; }
-# Check whether --enable-cray was given.
-if test "${enable_cray+set}" = set; then
-  enableval=$enable_cray; ok=$enableval
-else
-  ok=no
-fi
-
-{ $as_echo "$as_me:$LINENO: result: $ok" >&5
-$as_echo "$ok" >&6; }
-if test "$ok" = "yes"; then
-
-cat >>confdefs.h <<\_ACEOF
-#define CRAY 1
-_ACEOF
-
-    eval FCFLAGS="\$FCFLAGS' -em -ef'"
-    eval "ARRAY${N}='-DCRAY'"
-        N=`expr $N + 1`
-        FORTRAN_LIB=""
-fi
-
 # check whether to compile using GNU
 { $as_echo "$as_me:$LINENO: checking whether to use GNU compiler" >&5
 $as_echo_n "checking whether to use GNU compiler... " >&6; }
@@ -2548,13 +2517,8 @@ _ACEOF
 
 	eval "ARRAY${N}='-DGNU'"
         N=`expr $N + 1`
-	if (( `echo $HOST | grep -c "blacklight"` > 0 )); then
-	FORTRAN_LIB="-lgfortran -lmpi"
-
-	else
         FORTRAN_LIB="-lgfortran -lmpichf90"
 
-	fi
 fi
 
 # check whether to enable single precision
@@ -2883,7 +2847,8 @@ cat >>confdefs.h <<\_ACEOF
 #define ESSL 1
 _ACEOF
 
-#	AC_SUBST(LDFLAGS,"$LDFLAGS -lessl")
+	LDFLAGS="$LDFLAGS -lesslbg"
+
 	eval "ARRAY${N}='-DESSL'"
         N=`expr $N + 1`
 fi
@@ -2920,11 +2885,6 @@ $as_echo "$withfftw" >&6; }
 		FFTW_INC="-I$withfftw/include"
 
 		FFTW_LIB="$withfftw/lib/libfftw3.a"
-
-        elif test -e $withfftw/lib64/libfftw3.a ; then
-                FFTW_INC="-I$withfftw/include"
-
-                FFTW_LIB="$withfftw/lib64/libfftw3.a"
 
 	else
 		{ { $as_echo "$as_me:$LINENO: error: libfftw3.a was not found in given location!" >&5
