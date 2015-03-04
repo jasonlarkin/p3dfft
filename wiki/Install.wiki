@@ -69,3 +69,8 @@ as needed. If you wish to share more examples or to request or contribute in sup
 = Compiling on Blacklight (PSC) =
 || *Compiler* || *Modules* || *Arguments* ||
 || Intel || fftw || ./configure --enable-fftw --enable-intel --with-fftw=$FFTW_LIB/.. CC=icc FC=ifort FCFLAGS=-lmpi|| 
+
+= Compiling on Mira/Cetus/Vesta (ALCF) =
+|| *Compiler* || *Arguments* ||
+|| IBM XL  || ./configure --enable-ibm --enable-essl --with-essl=/soft/libraries/essl/current FC=mpixlf90_r CC=mpixlc_r|| 
+|| GNU  || ./configure --enable-gnu --enable-fftw --with-fftw=/soft/libraries/alcf/current/{xl,gcc}/FFTW3 FC=mpif90 CC=mpicc|| 
